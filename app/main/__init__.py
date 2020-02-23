@@ -12,7 +12,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         super().__init__(app)
         self.path_dir = None
         self._device = None  # type: Device
-        self.scene.set_event(process_events=lambda: self.app.processEvents())
+        self.scene_widget.set_event(process_events=lambda: self.app.processEvents())
         self.activateWindow()
 
     def _callback_open_triggered(self):
@@ -27,7 +27,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             return
 
         img_data = self._device.display.screen_cap()
-        self.scene.set_screen(img_data)
+        self.scene_widget.set_screen(img_data)
 
     def _callback_select_device_triggered(self):
         adb = PyADB('/Users/hsojo/Library/Android/sdk/platform-tools/adb')
