@@ -9,6 +9,22 @@ class Rect(Node):
         self._rect = QRect(x, y, w, h)
 
     @property
+    def x(self):
+        return self._rect.x()
+
+    @property
+    def y(self):
+        return self._rect.y()
+
+    @property
+    def w(self):
+        return self._rect.width()
+
+    @property
+    def h(self):
+        return self._rect.height()
+
+    @property
     def rect(self):
         return self._rect
 
@@ -16,13 +32,19 @@ class Rect(Node):
         self._rect.setSize(QSize(w, h))
 
     def set_position(self, x=None, y=None):
+        super().set_position(x, y)
         if x is not None:
             self._rect.setX(x)
         if y is not None:
-            self._rect.setX(y)
-        super().set_position(x, y)
+            self._rect.setY(y)
 
     def draw(self):
         p = self.painter
         p.setPen(self._pen)
-        p.drawRect(self._rect)
+        s = self.scale
+        if s == 1:
+            p.drawRect(self._rect)
+        else:
+            size = [self.x * s, self.y * s, self.w * s, self.h * s]
+            size = [int(i) for i in size]
+            p.drawRect(*size)

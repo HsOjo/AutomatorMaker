@@ -6,12 +6,14 @@ class Mouse:
     STAT_PRESS = 0
     STAT_RELEASE = 1
 
-    def __init__(self):
+    def __init__(self, event):
         self._position = QPoint(0, 0)
 
         self._down = False
         self._press = False
         self._release = False
+
+        self._event = event
 
     def update(self, e: QMouseEvent, status=None):
         self._position = e.pos()
@@ -28,6 +30,10 @@ class Mouse:
         self._release = False
 
     @property
+    def scale(self) -> float:
+        return self._event['scale']()
+
+    @property
     def down(self):
         return self._down
 
@@ -41,12 +47,12 @@ class Mouse:
 
     @property
     def position(self):
-        return self._position
+        return self.x, self.y
 
     @property
     def x(self):
-        return self._position.x()
+        return self._position.x() / self.scale
 
     @property
     def y(self):
-        return self._position.y()
+        return self._position.y() / self.scale

@@ -11,11 +11,15 @@ class Node:
 
     @property
     def position(self):
-        return self._position
+        return self._position.x(), self._position.y()
 
     @property
     def color(self):
         return self._color
+
+    @property
+    def scale(self) -> float:
+        return self._event['scale']()
 
     @property
     def painter(self) -> QPainter:

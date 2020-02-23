@@ -38,4 +38,10 @@ class Sprite(Node):
 
     def draw(self):
         p = self.painter
-        p.drawPixmap(self._rect.rect, self._pixmap)
+        s = self.scale
+        if s == 1:
+            p.drawPixmap(self._rect.rect, self._pixmap)
+        else:
+            size = [self.rect.x * s, self.rect.y * s, self.rect.w * s, self.rect.h * s]
+            size = [int(i) for i in size]
+            p.drawPixmap(*size, self._pixmap)

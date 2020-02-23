@@ -17,7 +17,7 @@ class Factory:
     def sprite(self, img_data: bytes = None):
         return Sprite(self._event, img_data)
 
-    def rect(self, x, y, w, h):
+    def rect(self, x=0, y=0, w=0, h=0):
         return Rect(self._event, x, y, w, h)
 
 
@@ -37,10 +37,18 @@ class GraphicsWidget(QWidget):
         self._frame_count = 0
         self._frame_count_p = 0
         self._frame_time = 0
-        self._event = dict(painter=lambda: self._painter)
+        self._scale = 1
 
-        self._mouse = Mouse()
+        self._event = dict(
+            painter=lambda: self._painter,
+            scale=lambda: self._scale,
+        )
+        self._mouse = Mouse(self._event)
+
         self.new = Factory(self._event)
+
+    def set_scale(self, scale: float):
+        self._scale = scale
 
     @property
     def dt(self):
@@ -53,6 +61,10 @@ class GraphicsWidget(QWidget):
     @property
     def mouse(self):
         return self._mouse
+
+    @property
+    def scale(self):
+        return self._scale
 
     @property
     def painter(self):

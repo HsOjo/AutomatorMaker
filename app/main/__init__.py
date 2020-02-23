@@ -27,7 +27,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             return
 
         img_data = self._device.display.screen_cap()
-        self.scene.set_img(img_data)
+        self.scene.set_screen(img_data)
 
     def _callback_select_device_triggered(self):
         adb = PyADB('/Users/hsojo/Library/Android/sdk/platform-tools/adb')

@@ -16,7 +16,7 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.actionOpen.triggered.connect(self._callback_open_triggered)
         self.actionSave.triggered.connect(self._callback_save_triggered)
         self.actionSelect_Device.triggered.connect(self._callback_select_device_triggered)
-        self.checkBoxScale.clicked.connect(self._callback_scale_clicked)
+        self.horizontalSliderScale.valueChanged.connect(self._callback_scale_clicked)
 
     def _callback_open_triggered(self):
         pass
@@ -30,5 +30,5 @@ class MainWindowView(Ui_MainWindow, BaseView):
     def _callback_select_device_triggered(self):
         pass
 
-    def _callback_scale_clicked(self):
-        self.scene.set_scale(self.checkBoxScale.isChecked())
+    def _callback_scale_clicked(self, value):
+        self.scene.set_scale(value / self.horizontalSliderScale.maximum())
