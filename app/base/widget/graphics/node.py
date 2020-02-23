@@ -5,13 +5,26 @@ from PyQt5.QtGui import QPainter, QColor, QPen
 class Node:
     def __init__(self, event: dict):
         self._event = event
+        self._debug = event['debug']()
         self._color = QColor(255, 255, 255)
         self._pen = QPen(self._color)
         self._position = QPoint(0, 0)
 
     @property
+    def pen(self):
+        return self._pen
+
+    @property
+    def x(self):
+        return self._position.x()
+
+    @property
+    def y(self):
+        return self._position.y()
+
+    @property
     def position(self):
-        return self._position.x(), self._position.y()
+        return self.x, self.y
 
     @property
     def color(self):
@@ -36,4 +49,5 @@ class Node:
         self._pen.setColor(color)
 
     def draw(self):
-        pass
+        p = self.painter
+        p.setPen(self._pen)

@@ -4,6 +4,7 @@ from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPainter, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QWidget
 
+from .font import Font
 from .mouse import Mouse
 from .node import Node
 from .rect import Rect
@@ -20,9 +21,12 @@ class Factory:
     def rect(self, x=0, y=0, w=0, h=0):
         return Rect(self._event, x, y, w, h)
 
+    def font(self, name='', size=11):
+        return Font(self._event, name, size)
+
 
 class GraphicsWidget(QWidget):
-    def __init__(self, parent=None, refresh_rate=60, **kwargs):
+    def __init__(self, parent=None, refresh_rate=60, debug=False, **kwargs):
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.ClickFocus)
         self.setMouseTracking(True)
@@ -38,17 +42,25 @@ class GraphicsWidget(QWidget):
         self._frame_count_p = 0
         self._frame_time = 0
         self._scale = 1
+        self._debug = debug
 
         self._event = dict(
             painter=lambda: self._painter,
             scale=lambda: self._scale,
+            debug=lambda: self._debug,
         )
-        self._mouse = Mouse(self._event)
 
+        self._mouse = Mouse(self._event)
         self.new = Factory(self._event)
 
     def set_scale(self, scale: float):
         self._scale = scale
+
+    def set_pause(self, b: bool):
+        if b:
+            self._timer.stop()
+        else:
+            self._timer.start(self._refresh_rate)
 
     @property
     def dt(self):
@@ -65,6 +77,10 @@ class GraphicsWidget(QWidget):
     @property
     def scale(self):
         return self._scale
+
+    @property
+    def debug(self):
+        return self._debug
 
     @property
     def painter(self):
@@ -101,11 +117,11 @@ class GraphicsWidget(QWidget):
 
     def showEvent(self, *args):
         super().showEvent(*args)
-        self._timer.start(self._refresh_rate)
+        self.set_pause(False)
 
     def hideEvent(self, *args):
         super().hideEvent(*args)
-        self._timer.stop()
+        self.set_pause(True)
 
     def mouseMoveEvent(self, me: QMouseEvent):
         super().mouseMoveEvent(me)

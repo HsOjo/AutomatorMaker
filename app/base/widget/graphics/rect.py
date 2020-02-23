@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QRect, QSize
+from PyQt5.QtCore import QRect
 
 from .node import Node
 
@@ -28,8 +28,15 @@ class Rect(Node):
     def rect(self):
         return self._rect
 
-    def set_size(self, w, h):
-        self._rect.setSize(QSize(w, h))
+    @property
+    def size(self):
+        return self.w, self.h
+
+    def set_size(self, w=None, h=None):
+        if w is not None:
+            self._rect.setWidth(w)
+        if h is not None:
+            self._rect.setHeight(h)
 
     def set_position(self, x=None, y=None):
         super().set_position(x, y)
@@ -39,8 +46,8 @@ class Rect(Node):
             self._rect.setY(y)
 
     def draw(self):
+        super().draw()
         p = self.painter
-        p.setPen(self._pen)
         s = self.scale
         if s == 1:
             p.drawRect(self._rect)

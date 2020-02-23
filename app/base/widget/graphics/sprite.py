@@ -37,6 +37,7 @@ class Sprite(Node):
         super().set_color(color)
 
     def draw(self):
+        super().draw()
         p = self.painter
         s = self.scale
         if s == 1:
