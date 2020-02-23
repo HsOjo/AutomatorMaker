@@ -2,14 +2,13 @@ from PyQt5.QtWidgets import QSizePolicy
 
 from app.base import BaseView
 from app.res.ui.main import Ui_MainWindow
-from app.widget import GraphicsWidget
+from .scene import SceneWidget
 
 
 class MainWindowView(Ui_MainWindow, BaseView):
     def callback_init(self):
-        self.scene = GraphicsWidget(self.scrollAreaWidgetContents)
+        self.scene = SceneWidget(self.scrollAreaWidgetContents)
         self.scene.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.scene.set_scale(False)
         self.gridLayout_Preview.addWidget(self.scene, 0, 0, 1, 1)
 
     def register_callback(self):
