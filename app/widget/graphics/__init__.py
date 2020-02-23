@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget
 
 
 def _update_size(func):
-    def wrapper(self: 'SceneWidget', *args, **kwargs):
+    def wrapper(self: 'GraphicsWidget', *args, **kwargs):
         result = func(self, *args, **kwargs)
         if self._scale:
             self.setMinimumSize(0, 0)
@@ -16,7 +16,7 @@ def _update_size(func):
     return wrapper
 
 
-class SceneWidget(QWidget):
+class GraphicsWidget(QWidget):
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent, **kwargs)
         self._pixmap = QPixmap()
@@ -43,4 +43,5 @@ class SceneWidget(QWidget):
         if not painter.isActive():
             painter.begin(self)
         painter.drawPixmap(x, y, pw, ph, self._pixmap)
+
         painter.end()

@@ -12,7 +12,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         super().__init__(app)
         self.path_dir = None
         self._device = None  # type: Device
-        # self.scene.set_scale(True)
+        # self.graphics.set_scale(True)
         self.activateWindow()
 
     def _callback_open_triggered(self):

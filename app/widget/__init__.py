@@ -1,1 +1,1 @@
-from .scene import SceneWidget
+from .graphics import GraphicsWidget
