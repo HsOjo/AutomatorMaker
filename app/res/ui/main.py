@@ -7,13 +7,13 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(871, 618)
         MainWindow.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -23,14 +23,16 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.listWidget = QtWidgets.QListWidget(self.groupBox)
+        self.tableWidget = QtWidgets.QTableWidget(self.groupBox)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.listWidget.sizePolicy().hasHeightForWidth())
-        self.listWidget.setSizePolicy(sizePolicy)
-        self.listWidget.setObjectName("listWidget")
-        self.gridLayout_2.addWidget(self.listWidget, 0, 0, 1, 1)
+        sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
+        self.tableWidget.setSizePolicy(sizePolicy)
+        self.tableWidget.setObjectName("tableWidget")
+        self.tableWidget.setColumnCount(0)
+        self.tableWidget.setRowCount(0)
+        self.gridLayout_2.addWidget(self.tableWidget, 0, 1, 1, 1)
         self.gridLayout.addWidget(self.groupBox, 0, 0, 1, 1)
         self.groupBoxPreview = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBoxPreview.setObjectName("groupBoxPreview")
@@ -40,7 +42,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 426, 398))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 379, 473))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_Preview = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_Preview.setContentsMargins(0, 0, 0, 0)
@@ -49,8 +51,6 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.scrollArea, 0, 0, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem)
         self.horizontalSliderScale = QtWidgets.QSlider(self.groupBoxPreview)
         self.horizontalSliderScale.setMinimum(10)
         self.horizontalSliderScale.setMaximum(100)
@@ -61,7 +61,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addLayout(self.horizontalLayout, 1, 0, 1, 1)
         self.gridLayout.addWidget(self.groupBoxPreview, 0, 1, 1, 1)
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
@@ -73,10 +73,10 @@ class Ui_MainWindow(object):
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.tabWidget.addTab(self.tab_2, "")
-        self.gridLayout.addWidget(self.tabWidget, 1, 0, 1, 3)
+        self.gridLayout.addWidget(self.tabWidget, 0, 2, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 871, 22))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")

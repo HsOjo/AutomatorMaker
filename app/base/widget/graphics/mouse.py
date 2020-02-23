@@ -2,7 +2,7 @@ from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QMouseEvent
 
 
-class Button:
+class MouseButton:
     def __init__(self, name, debug=False):
         self._name = name
         self._down = False
@@ -25,19 +25,19 @@ class Button:
     @down.setter
     def down(self, b: bool):
         if b and self._debug:
-            print(self._name, 'down')
+            print(self.__class__.__name__, 'down: %s' % self._name)
         self._down = b
 
     @press.setter
     def press(self, b: bool):
         if b and self._debug:
-            print(self._name, 'press')
+            print(self.__class__.__name__, 'press: %s' % self._name)
         self._press = b
 
     @release.setter
     def release(self, b: bool):
         if b and self._debug:
-            print(self._name, 'release')
+            print(self.__class__.__name__, 'release: %s' % self._name)
         self._release = b
 
 
@@ -59,7 +59,7 @@ class Mouse:
 
     def __init__(self, event):
         self._position = QPoint(0, 0)
-        self._buttons = dict((b, Button(b, debug=event['debug']())) for b in self.ALL_BUTTONS)
+        self._buttons = dict((b, MouseButton(b, debug=event['debug']())) for b in self.ALL_BUTTONS)
         self._event = event
 
     def update(self, e: QMouseEvent, status=None):

@@ -4,14 +4,13 @@ from app.base.widget import GraphicsWidget
 
 
 class SceneWidget(GraphicsWidget):
-    def __init__(self, parent=None, refresh_rate=60, **kwargs):
-        super().__init__(parent, refresh_rate)
+    def __init__(self, parent=None, **kwargs):
+        super().__init__(parent, **kwargs)
         self.screen = self.new.sprite()
         self.r = self.new.rect()
         self.r.set_color(QColor(255, 0, 0))
         self.f = self.new.font()
         self.f.set_color(QColor(0, 255, 0))
-        self.f.set_position(8, 16)
         self.f.set_border_mode(self.f.BORDER_MODE_4)
 
     def set_screen(self, img_data):
@@ -21,8 +20,9 @@ class SceneWidget(GraphicsWidget):
     def inject_size(self):
         pixmap = self.screen.pixmap
         scale = self.scale
-        w, h = pixmap.width() * scale, pixmap.height() * scale
-        self.setMinimumSize(w, h)
+        w, h = pixmap.width(), pixmap.height()
+        sw, sh = w * scale, h * scale
+        self.setMinimumSize(sw, sh)
 
     def set_scale(self, scale: float):
         super().set_scale(scale)
@@ -33,7 +33,6 @@ class SceneWidget(GraphicsWidget):
 
     def callback_update(self):
         self.f.set_text('FPS: %s' % self.fps)
-        self.f.set_position(self.width() - 48, self.height() - 24)
         if self.mouse.down('left'):
             self.r.set_position(*self.mouse.position)
         if self.mouse.press('left'):
@@ -45,8 +44,3 @@ class SceneWidget(GraphicsWidget):
     def callback_draw(self):
         self.screen.draw()
         self.r.draw()
-        self.f.rect.draw()
-        self.f.draw()
-
-    def callback_focus(self, b: bool):
-        self.set_pause(not b)

@@ -36,6 +36,10 @@ class Sprite(Node):
         self._rect.set_color(color)
         super().set_color(color)
 
+    def set_scale_available(self, b: bool):
+        super().set_scale_available(b)
+        self._rect.set_scale_available(b)
+
     def draw(self):
         super().draw()
         p = self.painter

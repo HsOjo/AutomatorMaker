@@ -26,7 +26,7 @@ class Factory:
 
 
 class GraphicsWidget(QWidget):
-    def __init__(self, parent=None, refresh_rate=60, debug=False, **kwargs):
+    def __init__(self, parent=None, event: dict = None, refresh_rate=60, debug=False, **kwargs):
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.ClickFocus)
         self.setMouseTracking(True)
@@ -35,7 +35,7 @@ class GraphicsWidget(QWidget):
         self._timer.timeout.connect(self._timer_timeout)
 
         self._painter = QPainter(self)
-        self._refresh_rate = 1000 / refresh_rate
+        self._refresh_rate = 0
         self._dt = 0
         self._fps = 0
         self._frame_count = 0
@@ -50,16 +50,30 @@ class GraphicsWidget(QWidget):
             debug=lambda: self._debug,
         )
 
+        if event is not None:
+            self._event.update(event)
+
+        self.set_refresh_rate(refresh_rate)
+
         self._mouse = Mouse(self._event)
         self.new = Factory(self._event)
+
+    def set_event(self, **kwargs):
+        for k, v in kwargs.items():
+            self._event[k] = v
 
     def set_scale(self, scale: float):
         self._scale = scale
 
+    def set_refresh_rate(self, refresh_rate):
+        self._refresh_rate = 1000 / refresh_rate
+
     def set_pause(self, b: bool):
-        if b:
+        if self._debug:
+            print(self.__class__.__name__, 'pause: %a' % b)
+        if b and self._timer.isActive():
             self._timer.stop()
-        else:
+        elif not self._timer.isActive():
             self._timer.start(self._refresh_rate)
 
     @property
@@ -109,6 +123,10 @@ class GraphicsWidget(QWidget):
             self._fps = self._frame_count - self._frame_count_p
             self._frame_count_p = self._frame_count
         self._mouse.reset()
+
+        pe = self._event.get('process_events')
+        if pe is not None:
+            pe()
 
     def resizeEvent(self, re: QResizeEvent):
         super().resizeEvent(re)

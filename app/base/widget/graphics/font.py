@@ -67,6 +67,10 @@ class Font(Node):
     def set_flags(self, flags):
         self._flags = flags
 
+    def set_scale_available(self, b: bool):
+        super().set_scale_available(b)
+        self._rect.set_scale_available(b)
+
     def draw(self):
         super().draw()
         p = self.painter

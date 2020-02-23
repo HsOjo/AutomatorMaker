@@ -7,7 +7,7 @@ from .scene import SceneWidget
 
 class MainWindowView(Ui_MainWindow, BaseView):
     def callback_init(self):
-        self.scene = SceneWidget(self.scrollAreaWidgetContents)
+        self.scene = SceneWidget(self.scrollAreaWidgetContents, debug=True)
         self.scene.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.gridLayout_Preview.addWidget(self.scene, 0, 0, 1, 1)
 

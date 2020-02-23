@@ -9,6 +9,7 @@ class Node:
         self._color = QColor(255, 255, 255)
         self._pen = QPen(self._color)
         self._position = QPoint(0, 0)
+        self._scale_available = True
 
     @property
     def pen(self):
@@ -32,11 +33,14 @@ class Node:
 
     @property
     def scale(self) -> float:
-        return self._event['scale']()
+        return self._event['scale']() if self._scale_available else 1
 
     @property
     def painter(self) -> QPainter:
         return self._event['painter']()
+
+    def set_scale_available(self, b: bool):
+        self._scale_available = b
 
     def set_position(self, x=None, y=None):
         if x is not None:
