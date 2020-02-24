@@ -3,6 +3,7 @@ import os
 import shutil
 from typing import Dict
 
+from app.base.common import try_exec
 from app.main.scene.model import SceneModel
 
 
@@ -12,7 +13,8 @@ class Project:
     def __init__(self):
         self._path = None
         self._event = dict(
-            get_path=self.get_path
+            get_path=self.get_path,
+            move_file=self.move_file,
         )
         self.scenes = {}  # type: Dict[SceneModel]
 
@@ -56,6 +58,14 @@ class Project:
         path_src = self.get_path(src)
         path_dest = self.get_path(dest, create_dir=True)
         shutil.move(path_src, path_dest)
+
+    @try_exec(show=True, info_only=True)
+    def rename_scene(self, old, new):
+        if new in self.scenes:
+            raise Exception('Already exist scene "%s"!' % new)
+        scene = self.scenes.pop(old)  # type: SceneModel
+        scene.rename(old, new)
+        self.scenes[new] = scene
 
     def add_scene(self, img_data: bytes, name=None):
         if name is None:

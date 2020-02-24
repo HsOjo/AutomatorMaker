@@ -132,6 +132,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         if item is not None:
             self._device = devices[item['sn']]
 
+    @_auto_save
     def _callback_rename_scene_triggered(self, b: bool):
         index = self.tableWidgetScenes.currentRow()
         if 0 <= index < self.tableWidgetScenes.rowCount():
@@ -139,7 +140,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
             text, b = QInputDialog.getText(self, self.tr('Rename Scene'), self.tr('Please input new scene name.'),
                                            text=item.text())
             if b:
-                item.setText(text)
+                if self._project.rename_scene(item.text(), text):
+                    item.setText(text)
 
     def _callback_scene_changed(self, current: str, previous: str):
         # Reset tab, if in actions.
@@ -157,6 +159,10 @@ class MainWindow(BaseMainWindow, MainWindowView):
             b = self.scene_widget.current_object is not None
             if b:
                 self.sync_object(self.scene_widget.current_object)
+        elif current == self.TAB_OBJECTS:
+            TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
+        elif current == self.TAB_FEATURES:
+            TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
         return b
 
     def showEvent(self, *args):

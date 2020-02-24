@@ -6,7 +6,7 @@ class BaseModel:
     def data(self):
         data = {}
         for k in dir(self):
-            if k[0] != '_' and k != 'data':
+            if k[0] != '_' and k != 'data' and k not in self._ignore_attrs:
                 v = getattr(self, k)
                 if isinstance(v, BaseModel):
                     v = v.data
