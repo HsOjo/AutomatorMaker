@@ -5,11 +5,17 @@ from PyQt5.QtGui import QPainter, QColor, QPen
 class Node:
     def __init__(self, event: dict):
         self._event = event
-        self._debug = event['debug']()
         self._color = QColor(255, 255, 255)
         self._pen = QPen(self._color)
         self._position = QPoint(0, 0)
         self._scale_available = True
+
+    @property
+    def debug(self):
+        debug = self._event.get('debug')
+        if debug is not None:
+            return debug()
+        return False
 
     @property
     def pen(self):

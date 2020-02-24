@@ -26,7 +26,7 @@ class Factory:
 
 
 class GraphicsWidget(QWidget):
-    def __init__(self, parent=None, event: dict = None, refresh_rate=60, debug=False, **kwargs):
+    def __init__(self, parent=None, event: dict = None, refresh_rate=60, **kwargs):
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.ClickFocus)
         self.setMouseTracking(True)
@@ -42,12 +42,10 @@ class GraphicsWidget(QWidget):
         self._frame_count_p = 0
         self._frame_time = 0
         self._scale = 1
-        self._debug = debug
 
         self._event = dict(
             painter=lambda: self._painter,
             scale=lambda: self._scale,
-            debug=lambda: self._debug,
         )
 
         if event is not None:
@@ -57,6 +55,13 @@ class GraphicsWidget(QWidget):
 
         self._mouse = Mouse(self._event)
         self.new = Factory(self._event)
+
+    @property
+    def debug(self):
+        debug = self._event.get('debug')
+        if debug is not None:
+            return debug()
+        return False
 
     def set_event(self, **kwargs):
         for k, v in kwargs.items():
@@ -69,7 +74,7 @@ class GraphicsWidget(QWidget):
         self._refresh_rate = 1000 / refresh_rate
 
     def set_pause(self, b: bool):
-        if self._debug:
+        if self.debug:
             print(self.__class__.__name__, 'pause: %a' % b)
         if b and self._timer.isActive():
             self._timer.stop()
@@ -91,10 +96,6 @@ class GraphicsWidget(QWidget):
     @property
     def scale(self):
         return self._scale
-
-    @property
-    def debug(self):
-        return self._debug
 
     @property
     def painter(self):

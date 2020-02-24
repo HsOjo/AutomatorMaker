@@ -1,6 +1,7 @@
 from PyQt5.QtGui import QColor
 
 from app.base.widget import GraphicsWidget
+from app.main.scene.model import SceneModel
 
 
 class SceneWidget(GraphicsWidget):
@@ -13,7 +14,12 @@ class SceneWidget(GraphicsWidget):
         self.f.set_color(QColor(0, 255, 0))
         self.f.set_border_mode(self.f.BORDER_MODE_4)
 
-    def set_screen(self, img_data):
+        self._scene = None
+
+    def set_scene(self, scene: SceneModel):
+        self._scene = scene
+        with open(scene.img_path, 'rb') as io:
+            img_data = io.read()
         self.screen.set_image(img_data)
         self.inject_size()
 

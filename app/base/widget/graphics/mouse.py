@@ -3,12 +3,19 @@ from PyQt5.QtGui import QMouseEvent
 
 
 class MouseButton:
-    def __init__(self, name, debug=False):
+    def __init__(self, name, event: dict):
         self._name = name
         self._down = False
         self._press = False
         self._release = False
-        self._debug = debug
+        self._event = event
+
+    @property
+    def debug(self):
+        debug = self._event.get('debug')
+        if debug is not None:
+            return debug()
+        return False
 
     @property
     def down(self):
@@ -24,19 +31,19 @@ class MouseButton:
 
     @down.setter
     def down(self, b: bool):
-        if b and self._debug:
+        if b and self.debug:
             print(self.__class__.__name__, 'down: %s' % self._name)
         self._down = b
 
     @press.setter
     def press(self, b: bool):
-        if b and self._debug:
+        if b and self.debug:
             print(self.__class__.__name__, 'press: %s' % self._name)
         self._press = b
 
     @release.setter
     def release(self, b: bool):
-        if b and self._debug:
+        if b and self.debug:
             print(self.__class__.__name__, 'release: %s' % self._name)
         self._release = b
 
@@ -59,8 +66,15 @@ class Mouse:
 
     def __init__(self, event):
         self._position = QPoint(0, 0)
-        self._buttons = dict((b, MouseButton(b, debug=event['debug']())) for b in self.ALL_BUTTONS)
         self._event = event
+        self._buttons = dict((b, MouseButton(b, event=self._event)) for b in self.ALL_BUTTONS)
+
+    @property
+    def debug(self):
+        debug = self._event.get('debug')
+        if debug is not None:
+            return debug()
+        return False
 
     def update(self, e: QMouseEvent, status=None):
         self._position = e.pos()

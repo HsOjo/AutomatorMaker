@@ -1,1 +1,1 @@
-# Automator Maker
+# AutomatorMaker
