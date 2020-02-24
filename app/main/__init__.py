@@ -1,5 +1,4 @@
 import sys
-import traceback
 
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QInputDialog
 from pyadb import PyADB, Device
@@ -10,15 +9,30 @@ from .project import Project
 from .scene.model import SceneModel, FeatureModel, ObjectModel, ActionModel
 from .view import MainWindowView
 from .. import BaseApplication
+from ..base.common import try_exec
 from ..base.helper import TableHelper
+
+
+def _auto_save(func):
+    def wrapper(self: 'MainWindow', *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        if self.auto_save:
+            project = self.project
+            if project is not None:
+                self.project.save()
+        return result
+
+    return wrapper
 
 
 class MainWindow(BaseMainWindow, MainWindowView):
     def __init__(self, app: BaseApplication):
-        super().__init__(app)
-        self._device = None  # type: Device
         self._project = None  # type: Project
+        self._auto_save = True
+        self._device = None  # type: Device
         self._debug = '--debug' in sys.argv
+
+        super().__init__(app)
 
         self.scene_widget.set_event(
             debug=lambda: self._debug,
@@ -27,6 +41,16 @@ class MainWindow(BaseMainWindow, MainWindowView):
 
         if self._debug:
             self._project = Project.open('./test')
+            self._device = list(PyADB('/Users/hsojo/Library/Android/sdk/platform-tools/adb').devices.values())[0]
+            self.sync_scenes()
+
+    @property
+    def project(self):
+        return self._project
+
+    @property
+    def auto_save(self):
+        return self._auto_save
 
     def sync_scenes(self):
         if self._project is None:
@@ -63,23 +87,21 @@ class MainWindow(BaseMainWindow, MainWindowView):
         TableHelper.sync_data(self.tableWidgetFeatures, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
 
-    def _callback_open_triggered(self):
+    @try_exec(show=True)
+    def _callback_open_triggered(self, b: bool):
         directory = QFileDialog.getExistingDirectory(self, self.tr('Open Project'))
-        try:
-            project = Project.open(directory)
-            if project is not None:
-                self._project = project
-        except:
-            QMessageBox.warning(self, self.tr('Error'), traceback.format_exc())
+        project = Project.open(directory)
+        if project is not None:
+            self._project = project
+            self.sync_scenes()
 
-    def _callback_save_triggered(self):
-        try:
-            if project is not None:
-                self._project.save()
-        except:
-            QMessageBox.warning(self, self.tr('Error'), traceback.format_exc())
+    @try_exec(show=True)
+    def _callback_save_triggered(self, b: bool):
+        if project is not None:
+            self._project.save()
 
-    def _callback_capture_triggered(self):
+    @_auto_save
+    def _callback_capture_triggered(self, b: bool):
         if self._project is None:
             QMessageBox.information(self, self.tr('Error'), self.tr('Open Project First!'))
             return
@@ -92,7 +114,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         self._project.add_scene(img_data, text if b and text != '' else None)
         self.sync_scenes()
 
-    def _callback_select_device_triggered(self):
+    def _callback_select_device_triggered(self, b: bool):
         adb = PyADB('/Users/hsojo/Library/Android/sdk/platform-tools/adb')
         devices = adb.devices
         if len(devices) == 0:
@@ -110,7 +132,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         if item is not None:
             self._device = devices[item['sn']]
 
-    def _callback_rename_scene_triggered(self):
+    def _callback_rename_scene_triggered(self, b: bool):
         index = self.tableWidgetScenes.currentRow()
         if 0 <= index < self.tableWidgetScenes.rowCount():
             item = self.tableWidgetScenes.item(index, 0)
@@ -120,6 +142,23 @@ class MainWindow(BaseMainWindow, MainWindowView):
                 item.setText(text)
 
     def _callback_scene_changed(self, current: str, previous: str):
+        # Reset tab, if in actions.
+        if self.tabWidgetScene.currentIndex() == self.TAB_ACTIONS:
+            self.tabWidgetScene.setCurrentIndex(self.TAB_FEATURES)
+
         scene = self._project.scenes.get(current)  # type: SceneModel
         if scene is not None:
             self.scene_widget.set_scene(scene)
+            self.sync_scene(scene)
+
+    def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
+        b = True
+        if current == self.TAB_ACTIONS:
+            b = self.scene_widget.current_object is not None
+            if b:
+                self.sync_object(self.scene_widget.current_object)
+        return b
+
+    def showEvent(self, *args):
+        super().showEvent(*args)
+        TableHelper.auto_inject_columns_width(self.tableWidgetScenes)

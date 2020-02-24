@@ -1,0 +1,25 @@
+import sys
+import traceback
+
+from PyQt5.QtWidgets import QMessageBox
+
+
+def try_exec(return_=False, show=False):
+    def wrapper(func):
+        def _wrapper(*args, **kwargs):
+            try:
+                result = func(*args, **kwargs)
+                if return_:
+                    return result
+                else:
+                    return True
+            except:
+                if show:
+                    exc = traceback.format_exc()
+                    print(exc, file=sys.stderr)
+                    QMessageBox.warning(None, 'Error', exc)
+                return False
+
+        return _wrapper
+
+    return wrapper

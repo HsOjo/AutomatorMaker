@@ -16,8 +16,15 @@ class SceneWidget(GraphicsWidget):
 
         self._scene = None
 
+        self.current_feature = None
+        self.current_object = None
+        self.current_action = None
+
     def set_scene(self, scene: SceneModel):
         self._scene = scene
+        self.current_feature = None
+        self.current_object = None
+        self.current_action = None
         with open(scene.img_path, 'rb') as io:
             img_data = io.read()
         self.screen.set_image(img_data)
@@ -50,3 +57,12 @@ class SceneWidget(GraphicsWidget):
     def callback_draw(self):
         self.screen.draw()
         self.r.draw()
+
+    def select_feature(self, index):
+        pass
+
+    def select_object(self, index):
+        pass
+
+    def select_action(self, index):
+        pass

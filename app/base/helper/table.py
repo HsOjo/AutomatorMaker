@@ -8,7 +8,7 @@ class TableHelper:
         col_length = [0 for _ in range(col_num)]
         for col_index in range(col_num):
             col = table.horizontalHeaderItem(col_index)
-            col_length[col_index] += len(col.text())
+            col_length[col_index] += len(col.text()) * 4
         row_num = table.rowCount()
         for row_index in range(row_num):
             for col_index in range(col_num):
@@ -42,3 +42,21 @@ class TableHelper:
         rows = table.rowCount()
         for row_index in range(rows - 1, data_l, -1):
             table.removeRow(row_index)
+
+    @staticmethod
+    def generate_current_item_changed_callback(table: QTableWidget, callback, primary_index=None):
+        def _callback(current: QTableWidgetItem, previous: QTableWidgetItem):
+            row_current = current.row()
+            row_previous = previous.row() if previous is not None else -1
+            if row_current != row_previous:
+                if primary_index is not None:
+                    name_current = table.item(row_current, primary_index).text()
+                    name_previous = None
+                    if previous is not None:
+                        name_previous = table.item(row_previous, primary_index).text()
+                    if name_current != name_previous:
+                        callback(name_current, name_previous)
+                else:
+                    callback(row_current, row_previous)
+
+        return _callback

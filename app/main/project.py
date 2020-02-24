@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from typing import Dict
@@ -6,6 +7,8 @@ from app.main.scene.model import SceneModel
 
 
 class Project:
+    FILENAME_INFO = 'info.json'
+
     def __init__(self):
         self._path = None
         self._event = dict(
@@ -18,10 +21,25 @@ class Project:
         if os.path.exists(path) and os.path.isdir(path):
             self = Project()
             self._path = path
+            if os.path.exists('%s/%s' % (path, self.FILENAME_INFO)):
+                self.load()
             return self
 
+    def load(self):
+        path = self.get_path(self.FILENAME_INFO)
+        with open(path, encoding='utf-8') as io:
+            data = json.load(io)  # type: dict
+        items = {}
+        for k, v in data.items():
+            scene = SceneModel(self._event)
+            scene.load_data(**v)
+            items[k] = scene
+        self.scenes = items
+
     def save(self):
-        pass
+        data = dict((k, v.data) for k, v in self.scenes.items())
+        with self.save_file(self.FILENAME_INFO, encoding='utf-8') as io:
+            json.dump(data, io, ensure_ascii=False, indent=4)
 
     def get_path(self, filename, create_dir=False):
         path = '%s/%s' % (self._path, filename)
