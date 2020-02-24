@@ -62,13 +62,13 @@ class MainWindowView(Ui_MainWindow, BaseView):
         pass
 
     def _callback_feature_changed(self, current: int, previous: int):
-        self.scene_widget.select_feature(current)
+        self.scene_widget.callback_select_feature(current)
 
     def _callback_object_changed(self, current: int, previous: int):
-        self.scene_widget.select_object(current)
+        self.scene_widget.callback_select_object(current)
 
     def _callback_action_changed(self, current: int, previous: int):
-        self.scene_widget.select_action(current)
+        self.scene_widget.callback_select_action(current)
 
     def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
         return True

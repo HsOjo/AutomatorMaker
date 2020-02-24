@@ -22,6 +22,10 @@ class Node:
         return self._pen
 
     @property
+    def event(self):
+        return self._event
+
+    @property
     def x(self):
         return self._position.x()
 

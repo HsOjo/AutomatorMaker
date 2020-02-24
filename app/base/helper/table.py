@@ -40,13 +40,13 @@ class TableHelper:
                 TableHelper.set_text(table, row_index, col_index, col)
 
         rows = table.rowCount()
-        for row_index in range(rows - 1, data_l, -1):
+        for row_index in range(rows - 1, data_l - 1, -1):
             table.removeRow(row_index)
 
     @staticmethod
     def generate_current_item_changed_callback(table: QTableWidget, callback, primary_index=None):
         def _callback(current: QTableWidgetItem, previous: QTableWidgetItem):
-            row_current = current.row()
+            row_current = current.row() if current is not None else -1
             row_previous = previous.row() if previous is not None else -1
             if row_current != row_previous:
                 if primary_index is not None:

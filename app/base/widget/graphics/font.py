@@ -82,8 +82,7 @@ class Font(Node):
         if s == 1:
             p.drawText(self._rect.rect, 0, self._text)
         else:
-            size = [*self.rect.position, *self.rect.size]
-            size = [int(i * s) for i in size]
+            size = [int(i * s) for i in self._rect]
             p.drawText(*size, 0, self._text)
 
     def draw_border(self):

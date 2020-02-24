@@ -51,18 +51,21 @@ class MouseButton:
 class Mouse:
     STAT_PRESS = 0
     STAT_RELEASE = 1
+
     BUTTON_LEFT = 0
-    BUTTON_RIGHT = 1
+    BUTTON_MID = 1
+    BUTTON_RIGHT = 2
+
     MAP_BUTTONS = {
-        Qt.LeftButton: ['left'],
-        Qt.RightButton: ['right'],
-        Qt.MiddleButton: ['mid'],
-        Qt.LeftButton | Qt.RightButton: ['left', 'right'],
-        Qt.LeftButton | Qt.MidButton: ['left', 'mid'],
-        Qt.MidButton | Qt.RightButton: ['mid', 'right'],
-        Qt.LeftButton | Qt.MidButton | Qt.RightButton: ['left', 'mid', 'right'],
+        Qt.LeftButton: [BUTTON_LEFT],
+        Qt.RightButton: [BUTTON_RIGHT],
+        Qt.MiddleButton: [BUTTON_MID],
+        Qt.LeftButton | Qt.RightButton: [BUTTON_LEFT, BUTTON_RIGHT],
+        Qt.LeftButton | Qt.MidButton: [BUTTON_LEFT, BUTTON_MID],
+        Qt.MidButton | Qt.RightButton: [BUTTON_MID, BUTTON_RIGHT],
+        Qt.LeftButton | Qt.MidButton | Qt.RightButton: [BUTTON_LEFT, BUTTON_MID, BUTTON_RIGHT],
     }
-    ALL_BUTTONS = ['left', 'right', 'mid']
+    ALL_BUTTONS = [BUTTON_LEFT, BUTTON_RIGHT, BUTTON_MID]
 
     def __init__(self, event):
         self._position = QPoint(0, 0)

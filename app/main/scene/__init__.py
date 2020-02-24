@@ -1,34 +1,70 @@
 from PyQt5.QtGui import QColor
 
 from app.base.widget import GraphicsWidget
-from app.main.scene.model import SceneModel
+from app.main.scene.editor import FeatureEditor, ObjectEditor, ActionEditor, BaseEditor
+from app.main.scene.model import SceneModel, ObjectModel, FeatureModel, ActionModel
 
 
 class SceneWidget(GraphicsWidget):
+    EDIT_FEATURE = 0
+    EDIT_OBJECT = 1
+    EDIT_ACTION = 2
+
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent, **kwargs)
+
         self.screen = self.new.sprite()
-        self.r = self.new.rect()
-        self.r.set_color(QColor(255, 0, 0))
-        self.f = self.new.font()
-        self.f.set_color(QColor(0, 255, 0))
-        self.f.set_border_mode(self.f.BORDER_MODE_4)
+        self.rect_base = self.new.rect()
+        self.rect_base.set_color(QColor(255, 0, 0))
 
-        self._scene = None
+        self._scene = None  # type: SceneModel
 
-        self.current_feature = None
-        self.current_object = None
-        self.current_action = None
+        self._feature_editor = FeatureEditor(self._event)
+        self._object_editor = ObjectEditor(self._event)
+        self._action_editor = ActionEditor(self._event)
+
+        self._editors = {
+            self.EDIT_FEATURE: self._feature_editor,
+            self.EDIT_OBJECT: self._object_editor,
+            self.EDIT_ACTION: self._action_editor,
+        }
+        self._currnet_editor = self.EDIT_FEATURE
+
+    @property
+    def current_editor(self) -> BaseEditor:
+        return self._editors[self._currnet_editor]
+
+    def callback_update(self):
+        self.current_editor.update()
+
+    def callback_draw(self):
+        self.screen.draw()
+        self.current_editor.draw()
+
+    def callback_resize(self, w, h):
+        self.inject_size()
+
+    def set_scale(self, scale: float):
+        super().set_scale(scale)
+        self.inject_size()
 
     def set_scene(self, scene: SceneModel):
         self._scene = scene
-        self.current_feature = None
-        self.current_object = None
-        self.current_action = None
         with open(scene.img_path, 'rb') as io:
             img_data = io.read()
         self.screen.set_image(img_data)
+        self._feature_editor.load_features(scene.features)
+        self._object_editor.load_objects(scene.objects)
         self.inject_size()
+
+    def set_current_editor(self, editor) -> bool:
+        if editor == self.EDIT_ACTION:
+            current_object = self._object_editor.current_object  # type: ObjectModel
+            if current_object is None:
+                return False
+            self._event['sync_actions'](current_object.actions)
+        self._currnet_editor = editor
+        return True
 
     def inject_size(self):
         pixmap = self.screen.pixmap
@@ -37,32 +73,16 @@ class SceneWidget(GraphicsWidget):
         sw, sh = w * scale, h * scale
         self.setMinimumSize(sw, sh)
 
-    def set_scale(self, scale: float):
-        super().set_scale(scale)
-        self.inject_size()
+    def callback_select_feature(self, index):
+        if self._scene is None:
+            return
+        self._feature_editor.select(index)
 
-    def callback_resize(self, w, h):
-        self.inject_size()
+    def callback_select_object(self, index):
+        if self._scene is None:
+            return
+        self._object_editor.select(index)
 
-    def callback_update(self):
-        self.f.set_text('FPS: %s' % self.fps)
-        if self.mouse.down('left'):
-            self.r.set_position(*self.mouse.position)
-        if self.mouse.press('left'):
-            x, y = self.r.position
-            mx, my = self.mouse.position
-            w, h = mx - x, my - y
-            self.r.set_size(w, h)
-
-    def callback_draw(self):
-        self.screen.draw()
-        self.r.draw()
-
-    def select_feature(self, index):
-        pass
-
-    def select_object(self, index):
-        pass
-
-    def select_action(self, index):
-        pass
+    def callback_select_action(self, index):
+        if self.current_object is None:
+            return

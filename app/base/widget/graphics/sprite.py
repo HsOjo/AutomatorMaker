@@ -47,6 +47,5 @@ class Sprite(Node):
         if s == 1:
             p.drawPixmap(self._rect.rect, self._pixmap)
         else:
-            size = [self.rect.x * s, self.rect.y * s, self.rect.w * s, self.rect.h * s]
-            size = [int(i) for i in size]
+            size = [int(i * s) for i in self._rect]
             p.drawPixmap(*size, self._pixmap)

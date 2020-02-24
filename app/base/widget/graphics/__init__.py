@@ -9,6 +9,7 @@ from .mouse import Mouse
 from .node import Node
 from .rect import Rect
 from .sprite import Sprite
+from ...common import try_exec
 
 
 class Factory:
@@ -46,6 +47,9 @@ class GraphicsWidget(QWidget):
         self._event = dict(
             painter=lambda: self._painter,
             scale=lambda: self._scale,
+            mouse=lambda: self._mouse,
+            dt=lambda: self._dt,
+            fps=lambda: self._fps,
         )
 
         if event is not None:
@@ -63,9 +67,12 @@ class GraphicsWidget(QWidget):
             return debug()
         return False
 
-    def set_event(self, **kwargs):
-        for k, v in kwargs.items():
-            self._event[k] = v
+    @property
+    def event_(self):
+        return self._event
+
+    def register_event(self, **kwargs):
+        self._event.update(**kwargs)
 
     def set_scale(self, scale: float):
         self._scale = scale

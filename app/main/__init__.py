@@ -1,4 +1,5 @@
 import sys
+from typing import List
 
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QInputDialog
 from pyadb import PyADB, Device
@@ -26,6 +27,10 @@ def _auto_save(func):
 
 
 class MainWindow(BaseMainWindow, MainWindowView):
+    TYPE_FEATURE = 0
+    TYPE_OBJECT = 1
+    TYPE_ACTION = 2
+
     def __init__(self, app: BaseApplication):
         self._project = None  # type: Project
         self._auto_save = True
@@ -34,9 +39,15 @@ class MainWindow(BaseMainWindow, MainWindowView):
 
         super().__init__(app)
 
-        self.scene_widget.set_event(
+        self.scene_widget.register_event(
             debug=lambda: self._debug,
-            process_events=lambda: self.app.processEvents()
+            process_events=lambda: self.app.processEvents(),
+            sync_features=self.sync_features,
+            sync_objects=self.sync_objects,
+            sync_actions=self.sync_actions,
+            select_feature=lambda i: self.select_item(self.TYPE_FEATURE, i),
+            select_object=lambda i: self.select_item(self.TYPE_OBJECT, i),
+            select_action=lambda i: self.select_item(self.TYPE_ACTION, i),
         )
 
         if self._debug:
@@ -52,6 +63,14 @@ class MainWindow(BaseMainWindow, MainWindowView):
     def auto_save(self):
         return self._auto_save
 
+    def select_item(self, type_, index):
+        widgets = {
+            self.TYPE_FEATURE: self.tableWidgetFeatures,
+            self.TYPE_OBJECT: self.tableWidgetObjects,
+            self.TYPE_ACTION: self.tableWidgetActions,
+        }
+        widgets[type_].setCurrentCell(index, 0)
+
     def sync_scenes(self):
         if self._project is None:
             return
@@ -65,23 +84,28 @@ class MainWindow(BaseMainWindow, MainWindowView):
         TableHelper.auto_inject_columns_width(self.tableWidgetScenes)
 
     def sync_scene(self, scene: SceneModel):
+        self.sync_features(scene.features)
+        self.sync_objects(scene.objects)
+
+    def sync_features(self, features: List[FeatureModel]):
         data = []
-        for i, v in enumerate(scene.features):
+        for i, v in enumerate(features):
             v: FeatureModel
-            data.append([i, v.name, '%s,%s,%s,%s' % v.rect, v.detect_weight])
+            data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.detect_weight])
         TableHelper.sync_data(self.tableWidgetFeatures, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
 
+    def sync_objects(self, objects: List[ObjectModel]):
         data = []
-        for i, v in enumerate(scene.objects):
+        for i, v in enumerate(objects):
             v: ObjectModel
-            data.append([i, v.name, '%s,%s,%s,%s' % v.rect, v.type, len(v.actions)])
+            data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.type, len(v.actions)])
         TableHelper.sync_data(self.tableWidgetObjects, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
 
-    def sync_object(self, object: ObjectModel):
+    def sync_actions(self, actions: List[ActionModel]):
         data = []
-        for i, v in enumerate(object.actions):
+        for i, v in enumerate(actions):
             v: ActionModel
             data.append([i, v.name, v.type, v.dest_scene, v.params])
         TableHelper.sync_data(self.tableWidgetFeatures, data)
@@ -154,11 +178,9 @@ class MainWindow(BaseMainWindow, MainWindowView):
             self.sync_scene(scene)
 
     def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
-        b = True
+        b = self.scene_widget.set_current_editor(current)
         if current == self.TAB_ACTIONS:
-            b = self.scene_widget.current_object is not None
-            if b:
-                self.sync_object(self.scene_widget.current_object)
+            TableHelper.auto_inject_columns_width(self.tableWidgetActions)
         elif current == self.TAB_OBJECTS:
             TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
         elif current == self.TAB_FEATURES:
