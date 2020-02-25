@@ -16,6 +16,7 @@ class RectAdjuster:
         self._adjusting = False
         self._rect = None  # type:Rect
         self._rect_bak = None  # type:Rect
+        self._callback_adjust = None
         self.set_size(size)
 
     @property
@@ -74,6 +75,8 @@ class RectAdjuster:
 
             if mouse.release(mouse.BUTTON_LEFT):
                 self._adjusting = False
+                if self._callback_adjust is not None:
+                    self._callback_adjust(self._adjusting)
                 self._rect.set_size(*self._rect.size, convert_negative=True)
                 self.adjust(self._rect)
         else:
@@ -89,8 +92,13 @@ class RectAdjuster:
                 if self._adjuster is not None:
                     self._rect_bak = self._rect.copy()
                     self._adjusting = True
+                    if self._callback_adjust is not None:
+                        self._callback_adjust(self._adjusting)
 
     def draw(self):
         if not self._adjusting:
             for rect in self._rects:
                 rect.draw()
+
+    def set_callback_adjust(self, func):
+        self._callback_adjust = func

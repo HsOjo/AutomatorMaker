@@ -79,9 +79,9 @@ class RectEditor(BaseEditor):
         rect.set_size(*rect.size, convert_negative=True)
         rect.set_focus_color(self.COLOR_FOCUS, self.COLOR_UNFOCUS)
         rect.set_callback_moving(lambda b: self.callback_rect_moving(rect, b))
-        if sync:
-            if self.add_item(rect):
-                self.set_current_rect(rect)
+        rect.adjuster.set_callback_adjust(lambda b: self.callback_adjust(rect, b))
+        if sync and self.add_item(rect):
+            self.set_current_rect(rect)
 
         return rect
 
@@ -95,7 +95,7 @@ class RectEditor(BaseEditor):
         if self._creating:
             self._new_rect.draw()
 
-    def callback_rect_moving(self, rect_moving: AdvanceRect, moving):
+    def callback_rect_moving(self, rect_moving: AdvanceRect, moving: bool):
         for rect in self._rects:
             if moving:
                 if rect != rect_moving:
@@ -103,3 +103,6 @@ class RectEditor(BaseEditor):
             else:
                 if rect != rect_moving:
                     rect.set_color(self.COLOR_UNFOCUS)
+
+    def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
+        pass

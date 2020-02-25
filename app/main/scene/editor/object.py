@@ -2,6 +2,16 @@ from typing import List
 
 from .rect import RectEditor
 from ..model import ObjectModel
+from ..object import AdvanceRect
+
+
+def _sync(func):
+    def wrapper(self: 'ObjectEditor', *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        self.sync()
+        return result
+
+    return wrapper
 
 
 class ObjectEditor(RectEditor):
@@ -17,7 +27,7 @@ class ObjectEditor(RectEditor):
         self._objects = objects
         rects = {}
         for object in objects:
-            rect = self.new_rect(False, object.rect)
+            rect = self.new_rect(object.rect, False)
             rects[rect] = object
         self._rects = rects
         self.set_current_rect(None, False)
@@ -28,6 +38,7 @@ class ObjectEditor(RectEditor):
         if sync and rect in self._rects:
             self.event['select_object'](self.rects.index(rect))
 
+    @_sync
     def add_item(self, rect):
         if self._objects is None:
             return False
@@ -43,5 +54,19 @@ class ObjectEditor(RectEditor):
         object.rect = [*rect]
         self._rects[rect] = object
         self._objects.append(object)
-        self.event['sync_objects'](self._objects)
         return True
+
+    @_sync
+    def callback_rect_moving(self, rect_moving: AdvanceRect, moving):
+        super().callback_rect_moving(rect_moving, moving)
+
+    @_sync
+    def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
+        super().callback_adjust(rect_adjust, adjust)
+
+    def sync(self):
+        for rect, object in self._rects.items():
+            rect: AdvanceRect
+            object: ObjectModel
+            object.rect = [*rect]
+        self.event['sync_objects'](self._objects)

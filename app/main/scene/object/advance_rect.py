@@ -27,6 +27,10 @@ class AdvanceRect(Rect):
         return rect
 
     @property
+    def adjuster(self):
+        return self._adjuster
+
+    @property
     def moving(self):
         return self._moving
 

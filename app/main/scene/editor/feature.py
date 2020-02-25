@@ -2,6 +2,16 @@ from typing import List
 
 from .rect import RectEditor
 from ..model import FeatureModel
+from ..object import AdvanceRect
+
+
+def _sync(func):
+    def wrapper(self: 'FeatureEditor', *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        self.sync()
+        return result
+
+    return wrapper
 
 
 class FeatureEditor(RectEditor):
@@ -17,7 +27,7 @@ class FeatureEditor(RectEditor):
         self._features = features
         rects = {}
         for feature in features:
-            rect = self.new_rect(False, feature.rect)
+            rect = self.new_rect(feature.rect, False)
             rects[rect] = feature
         self._rects = rects
         self.set_current_rect(None, False)
@@ -28,6 +38,7 @@ class FeatureEditor(RectEditor):
         if sync and rect in self._rects:
             self.event['select_feature'](self.rects.index(rect))
 
+    @_sync
     def add_item(self, rect):
         if self._features is None:
             return False
@@ -43,5 +54,19 @@ class FeatureEditor(RectEditor):
         feature.rect = [*rect]
         self._rects[rect] = feature
         self._features.append(feature)
-        self.event['sync_features'](self._features)
         return True
+
+    @_sync
+    def callback_rect_moving(self, rect_moving: AdvanceRect, moving):
+        super().callback_rect_moving(rect_moving, moving)
+
+    @_sync
+    def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
+        super().callback_adjust(rect_adjust, adjust)
+
+    def sync(self):
+        for rect, feature in self._rects.items():
+            rect: AdvanceRect
+            feature: FeatureModel
+            feature.rect = [*rect]
+        self.event['sync_features'](self._features)
