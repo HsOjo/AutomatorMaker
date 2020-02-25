@@ -35,8 +35,7 @@ class RectAdjuster:
     def adjust(self, rect: Rect):
         self._rect = rect
         x, y, w, h = rect
-        w2 = w / 2
-        h2 = h / 2
+        w2, h2 = list_math.divide([w, h], [2, 2])
         self.move(self._lu, x, y)
         self.move(self._u, x + w2, y)
         self.move(self._ru, x + w, y)

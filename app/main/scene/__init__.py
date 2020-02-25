@@ -71,6 +71,7 @@ class SceneWidget(GraphicsWidget):
             if current_object is None:
                 return False
             self._event['sync_actions'](current_object.actions)
+            self._action_editor.load_actions(current_object)
         self._currnet_editor = editor
         return True
 

@@ -120,8 +120,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
         for i, v in enumerate(actions):
             v: ActionModel
             data.append([i, v.name, v.ALL_TYPES_REV.get(v.type), v.dest_scene, v.params])
-        TableHelper.sync_data(self.tableWidgetFeatures, data)
-        TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
+        TableHelper.sync_data(self.tableWidgetActions, data)
+        TableHelper.auto_inject_columns_width(self.tableWidgetActions)
 
     @try_exec(show=True)
     def _callback_open_triggered(self, b: bool):
