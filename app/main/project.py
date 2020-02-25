@@ -27,6 +27,7 @@ class Project:
                 self.load()
             return self
 
+    @try_exec(show=True, info_only=True)
     def load(self):
         path = self.get_path(self.FILENAME_INFO)
         with open(path, encoding='utf-8') as io:
@@ -38,6 +39,7 @@ class Project:
             items[k] = scene
         self.scenes = items
 
+    @try_exec(show=True, info_only=True)
     def save(self):
         data = dict((k, v.data) for k, v in self.scenes.items())
         with self.save_file(self.FILENAME_INFO, encoding='utf-8') as io:

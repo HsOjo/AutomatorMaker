@@ -16,8 +16,11 @@ from ..base.helper import TableHelper
 
 def _auto_save(func):
     def wrapper(self: 'MainWindow', *args, **kwargs):
+        auto_save = True
+        if 'auto_save' in kwargs:
+            auto_save = kwargs.pop('auto_save')
         result = func(self, *args, **kwargs)
-        if self.auto_save:
+        if self.auto_save and auto_save:
             project = self.project
             if project is not None:
                 self.project.save()
@@ -84,9 +87,10 @@ class MainWindow(BaseMainWindow, MainWindowView):
         TableHelper.auto_inject_columns_width(self.tableWidgetScenes)
 
     def sync_scene(self, scene: SceneModel):
-        self.sync_features(scene.features)
-        self.sync_objects(scene.objects)
+        self.sync_features(scene.features, auto_save=False)
+        self.sync_objects(scene.objects, auto_save=False)
 
+    @_auto_save
     def sync_features(self, features: List[FeatureModel]):
         data = []
         for i, v in enumerate(features):
@@ -94,7 +98,9 @@ class MainWindow(BaseMainWindow, MainWindowView):
             data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.detect_weight])
         TableHelper.sync_data(self.tableWidgetFeatures, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
+        self.sync_scenes()
 
+    @_auto_save
     def sync_objects(self, objects: List[ObjectModel]):
         data = []
         for i, v in enumerate(objects):
@@ -102,7 +108,9 @@ class MainWindow(BaseMainWindow, MainWindowView):
             data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.type, len(v.actions)])
         TableHelper.sync_data(self.tableWidgetObjects, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
+        self.sync_scenes()
 
+    @_auto_save
     def sync_actions(self, actions: List[ActionModel]):
         data = []
         for i, v in enumerate(actions):
