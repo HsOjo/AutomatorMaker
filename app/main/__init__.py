@@ -245,7 +245,10 @@ class MainWindow(BaseMainWindow, MainWindowView):
 
     def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
         super()._callback_scene_tab_changed(current, previous)
-        return self.scene_widget.set_current_editor(current)
+        b = self.scene_widget.set_current_editor(current)
+        if not b:
+            QMessageBox.warning(self, self.tr('Error'), self.tr('Please select "Object Item" first!'))
+        return b
 
     def showEvent(self, *args):
         super().showEvent(*args)

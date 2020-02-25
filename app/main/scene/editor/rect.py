@@ -44,11 +44,12 @@ class RectEditor(BaseEditor):
 
     def update(self):
         mouse = self.mouse
+        mouse_l = mouse.button(mouse.BUTTON_LEFT)
         rect_new = self._new_rect
 
         if self._creating:
             rect_new.set_size(mouse.x - rect_new.x, mouse.y - rect_new.y)
-            if mouse.release(mouse.BUTTON_LEFT):
+            if mouse_l.release:
                 self.new_rect()
                 self._creating = False
         else:
@@ -60,7 +61,7 @@ class RectEditor(BaseEditor):
                     self.set_current_rect(None)
 
             if self._current_rect is None:
-                if mouse.down(mouse.BUTTON_LEFT):
+                if mouse_l.down:
                     for rect in reversed(self.rects):
                         if rect.check_point(*mouse.position):
                             self.set_current_rect(rect)

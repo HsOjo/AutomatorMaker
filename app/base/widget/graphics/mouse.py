@@ -1,21 +1,29 @@
+import time
+
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QMouseEvent
 
+from app.base.common import point_distance
+
 
 class MouseButton:
+    CLICK_INTERVAL = 0.18
+
     def __init__(self, name, event: dict):
+        self._event = event
         self._name = name
         self._down = False
         self._press = False
         self._release = False
-        self._event = event
+        self._click_count = 0
+        self._click_distance = 0
+        self._down_time = 0
+        self._down_pos = None
+        self._release_pos = None
 
     @property
-    def debug(self):
-        debug = self._event.get('debug')
-        if debug is not None:
-            return debug()
-        return False
+    def _position(self):
+        return self._event['position']()
 
     @property
     def down(self):
@@ -29,23 +37,48 @@ class MouseButton:
     def release(self):
         return self._release
 
+    @property
+    def click_count(self):
+        return self._click_count
+
+    @property
+    def click_distance(self):
+        return self._click_distance
+
+    @property
+    def press_time(self):
+        return time.time() - self._down_time
+
     @down.setter
     def down(self, b: bool):
-        if b and self.debug:
-            print(self.__class__.__name__, 'down: %s' % self._name)
+        if b and self._down != b:
+            self._down_time = time.time()
+            self._down_pos = self._position
         self._down = b
 
     @press.setter
     def press(self, b: bool):
-        if b and self.debug:
-            print(self.__class__.__name__, 'press: %s' % self._name)
         self._press = b
 
     @release.setter
     def release(self, b: bool):
-        if b and self.debug:
-            print(self.__class__.__name__, 'release: %s' % self._name)
+        if b and self._release != b:
+            if time.time() - self._down_time < self.CLICK_INTERVAL:
+                self._click_count += 1
+            else:
+                self._click_count = 1
+            self._release_pos = self._position
+            self._click_distance = point_distance(*self._down_pos, *self._release_pos)
         self._release = b
+
+    def reset(self):
+        self._down = False
+        self._release = False
+        if time.time() - self._down_time > self.CLICK_INTERVAL:
+            self._click_count = 0
+
+    def click(self, count=1):
+        return self._click_count >= count and self._release
 
 
 class Mouse:
@@ -67,10 +100,13 @@ class Mouse:
     }
     ALL_BUTTONS = [BUTTON_LEFT, BUTTON_RIGHT, BUTTON_MID]
 
-    def __init__(self, event):
+    def __init__(self, event: dict):
         self._position = QPoint(0, 0)
-        self._event = event
-        self._buttons = dict((b, MouseButton(b, event=self._event)) for b in self.ALL_BUTTONS)
+        self._event = event.copy()
+        self._event.update(
+            position=lambda: self.position
+        )
+        self._buttons = dict((b, MouseButton(b, self._event)) for b in self.ALL_BUTTONS)
 
     @property
     def debug(self):
@@ -99,21 +135,14 @@ class Mouse:
     def reset(self):
         for k in self.ALL_BUTTONS:
             btn = self._buttons[k]
-            btn.down = False
-            btn.release = False
+            btn.reset()
 
     @property
     def scale(self) -> float:
         return self._event['scale']()
 
-    def down(self, btn):
-        return self._buttons[btn].down
-
-    def press(self, btn):
-        return self._buttons[btn].press
-
-    def release(self, btn):
-        return self._buttons[btn].release
+    def button(self, btn):
+        return self._buttons[btn]
 
     @property
     def position(self):

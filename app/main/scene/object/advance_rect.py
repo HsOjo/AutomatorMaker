@@ -62,6 +62,7 @@ class AdvanceRect(Rect):
 
     def update(self):
         mouse = self._event['mouse']()  # type: Mouse
+        mouse_l = mouse.button(mouse.BUTTON_LEFT)
 
         if self._focus:
             self._adjuster.update()
@@ -70,13 +71,13 @@ class AdvanceRect(Rect):
                     self.set_position(*list_math.add(
                         self._backup.position, list_math.reduce(mouse.position, self._move_origin)
                     ))
-                    if mouse.release(mouse.BUTTON_LEFT):
+                    if mouse_l.release:
                         self._adjuster.adjust(self)
                         self._moving = False
                         if self._callback_moving is not None:
                             self._callback_moving(self._moving)
                 else:
-                    if mouse.down(mouse.BUTTON_LEFT):
+                    if mouse_l.down:
                         if self.check_point(*mouse.position):
                             self._backup = self.copy()
                             self._move_origin = mouse.position

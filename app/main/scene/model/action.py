@@ -4,6 +4,8 @@ from app.base.model import BaseModel
 class ActionModel(BaseModel):
     TYPE_TAP = 0
     TYPE_SWIPE = 1
+    TYPE_PRESS = 2
+
     ALL_TYPES = {
         'Tap': TYPE_TAP,
         'Swipe': TYPE_SWIPE,

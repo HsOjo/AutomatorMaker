@@ -47,11 +47,13 @@ class RectAdjuster:
 
     def update(self):
         mouse = self._event['mouse']()  # type: Mouse
+        mouse_l = mouse.button(mouse.BUTTON_LEFT)
+
         if self._adjusting:
             if self._adjuster == self._lu:
                 self._rect.set_position(*mouse.position)
                 self._rect.set_size(*list_math.add(
-                    self._rect_bak.size, list_math.reduce(self._rect_bak.position, mouse.position)
+                    self._rect_bak.size, list_math.reduce(self._rect_bak._position, mouse.position)
                 ))
             elif self._adjuster == self._u:
                 self._rect.set_position(y=mouse.y)
@@ -72,7 +74,7 @@ class RectAdjuster:
             elif self._adjuster == self._rd:
                 self._rect.set_size(w=mouse.x - self._rect_bak.x, h=mouse.y - self._rect_bak.y)
 
-            if mouse.release(mouse.BUTTON_LEFT):
+            if mouse_l.release:
                 self._adjusting = False
                 if self._callback_adjust is not None:
                     self._callback_adjust(self._adjusting)
@@ -87,7 +89,7 @@ class RectAdjuster:
                 else:
                     rect.set_color(self.COLOR_NORMAL)
 
-            if mouse.down(mouse.BUTTON_LEFT):
+            if mouse_l.down:
                 if self._adjuster is not None:
                     self._rect_bak = self._rect.copy()
                     self._adjusting = True

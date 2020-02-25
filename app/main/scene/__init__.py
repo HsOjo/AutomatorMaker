@@ -66,7 +66,7 @@ class SceneWidget(GraphicsWidget):
         self._object_editor.load_objects(scene.objects)
         self.inject_size()
 
-    def set_current_editor(self, editor) -> bool:
+    def set_current_editor(self, editor: int) -> bool:
         if editor == self.EDIT_ACTION:
             current_object = self._object_editor.current_object  # type: ObjectModel
             if current_object is None:
