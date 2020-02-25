@@ -109,7 +109,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         data = []
         for i, v in enumerate(objects):
             v: ObjectModel
-            data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.type, len(v.actions)])
+            data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.ALL_TYPES_REV.get(v.type), len(v.actions)])
         TableHelper.sync_data(self.tableWidgetObjects, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
         self.sync_scenes()
@@ -119,7 +119,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         data = []
         for i, v in enumerate(actions):
             v: ActionModel
-            data.append([i, v.name, v.type, v.dest_scene, v.params])
+            data.append([i, v.name, v.ALL_TYPES_REV.get(v.type), v.dest_scene, v.params])
         TableHelper.sync_data(self.tableWidgetFeatures, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
 
@@ -181,6 +181,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
 
     @_auto_save
     def _callback_edit_item(self, item):
+        self.scene_widget.set_pause(True)
         if isinstance(item, FeatureModel):
             data = FormDialog.input([
                 StringField('name', item.name, title=self.tr('Name')),
@@ -191,16 +192,18 @@ class MainWindow(BaseMainWindow, MainWindowView):
                     title=self.tr('Detect Weight')
                 ),
             ], self.tr('Edit Feature'))
-            item.load_data(**data)
-            self.sync_features(self.scene_widget.scene.features)
+            if data is not None:
+                item.load_data(**data)
+                self.sync_features(self.scene_widget.scene.features)
         elif isinstance(item, ObjectModel):
             data = FormDialog.input([
                 StringField('name', item.name, title=self.tr('Name')),
                 RectField('rect', item.rect, title=self.tr('Rect')),
                 SelectField('type', options=item.ALL_TYPES, value=item.type, title=self.tr('Type')),
             ], self.tr('Edit Object'))
-            item.load_data(**data)
-            self.sync_objects(self.scene_widget.scene.objects)
+            if data is not None:
+                item.load_data(**data)
+                self.sync_objects(self.scene_widget.scene.objects)
         elif isinstance(item, ActionModel):
             data = FormDialog.input([
                 StringField('name', item.name, title=self.tr('Name')),
@@ -210,8 +213,10 @@ class MainWindow(BaseMainWindow, MainWindowView):
                     value=item.dest_scene, title=self.tr('Type')
                 ),
             ], self.tr('Edit Action'))
-            item.load_data(**data)
-            self.sync_actions(self.scene_widget.current_object.actions)
+            if data is not None:
+                item.load_data(**data)
+                self.sync_actions(self.scene_widget.current_object.actions)
+        self.scene_widget.set_pause(False)
 
     @_auto_save
     def _callback_delete_item_triggered(self, index):

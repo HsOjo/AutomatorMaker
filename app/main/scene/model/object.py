@@ -13,6 +13,7 @@ class ObjectModel(BaseModel):
     ALL_TYPES = {
         'Button': TYPE_BUTTON,
     }
+    ALL_TYPES_REV = dict((v, k) for k, v in ALL_TYPES.items())
 
     def __init__(self):
         self.name = ''

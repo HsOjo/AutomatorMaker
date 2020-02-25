@@ -8,6 +8,7 @@ class ActionModel(BaseModel):
         'Tap': TYPE_TAP,
         'Swipe': TYPE_SWIPE,
     }
+    ALL_TYPES_REV = dict((v, k) for k, v in ALL_TYPES.items())
 
     def __init__(self, parent=None):
         self.name = ''

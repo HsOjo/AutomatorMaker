@@ -7,7 +7,7 @@ class RectField(StringField):
     def __init__(self, name, value: List[int] = None, title=None):
         super().__init__(name, title=title)
         if value is not None:
-            value = ', '.join([str(i) for i in value])
+            value = ','.join([str(i) for i in value])
             self.widget.setText(value)
 
     @property

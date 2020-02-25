@@ -4,26 +4,20 @@ from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPainter, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QWidget
 
+from .factory import Factory
 from .font import Font
 from .mouse import Mouse
 from .node import Node
 from .rect import Rect
 from .sprite import Sprite
-from ...common import try_exec
 
 
-class Factory:
-    def __init__(self, event):
-        self._event = event
+def _ignore_on_pause(func):
+    def wrapper(self: 'GraphicsWidget', *args, **kwargs):
+        if not self.pause:
+            return func(self, *args, **kwargs)
 
-    def sprite(self, img_data: bytes = None):
-        return Sprite(self._event, img_data)
-
-    def rect(self, x=0, y=0, w=0, h=0):
-        return Rect(self._event, x, y, w, h)
-
-    def font(self, name='', size=11):
-        return Font(self._event, name, size)
+    return wrapper
 
 
 class GraphicsWidget(QWidget):
@@ -71,6 +65,10 @@ class GraphicsWidget(QWidget):
     def event_(self):
         return self._event
 
+    @property
+    def pause(self):
+        return not self._timer.isActive()
+
     def register_event(self, **kwargs):
         self._event.update(**kwargs)
 
@@ -83,9 +81,9 @@ class GraphicsWidget(QWidget):
     def set_pause(self, b: bool):
         if self.debug:
             print(self.__class__.__name__, 'pause: %a' % b)
-        if b and self._timer.isActive():
+        if b and not self.pause:
             self._timer.stop()
-        elif not self._timer.isActive():
+        elif self.pause:
             self._timer.start(self._refresh_rate)
 
     @property
@@ -136,6 +134,7 @@ class GraphicsWidget(QWidget):
         if pe is not None:
             pe()
 
+    @_ignore_on_pause
     def resizeEvent(self, re: QResizeEvent):
         super().resizeEvent(re)
         size = re.size()
@@ -149,22 +148,27 @@ class GraphicsWidget(QWidget):
         super().hideEvent(*args)
         self.set_pause(True)
 
+    @_ignore_on_pause
     def mouseMoveEvent(self, me: QMouseEvent):
         super().mouseMoveEvent(me)
         self._mouse.update(me)
 
+    @_ignore_on_pause
     def mousePressEvent(self, me: QMouseEvent):
         super().mousePressEvent(me)
         self._mouse.update(me, status=Mouse.STAT_PRESS)
 
+    @_ignore_on_pause
     def mouseReleaseEvent(self, me: QMouseEvent):
         super().mousePressEvent(me)
         self._mouse.update(me, status=Mouse.STAT_RELEASE)
 
+    @_ignore_on_pause
     def focusInEvent(self, *args):
         super().focusInEvent(*args)
         self.callback_focus(True)
 
+    @_ignore_on_pause
     def focusOutEvent(self, *args):
         super().focusOutEvent(*args)
         self.callback_focus(False)
