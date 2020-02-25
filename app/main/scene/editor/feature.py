@@ -65,6 +65,9 @@ class FeatureEditor(RectEditor):
         super().callback_adjust(rect_adjust, adjust)
 
     def sync(self):
+        if self._features is None:
+            return
+
         for rect, feature in self._rects.items():
             rect: AdvanceRect
             feature: FeatureModel

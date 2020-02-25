@@ -65,6 +65,9 @@ class ObjectEditor(RectEditor):
         super().callback_adjust(rect_adjust, adjust)
 
     def sync(self):
+        if self._objects is None:
+            return
+
         for rect, object in self._rects.items():
             rect: AdvanceRect
             object: ObjectModel
