@@ -50,7 +50,6 @@ class SelectDialog(QDialog, SelectorView):
     @staticmethod
     def select(parent=None, title=None, cols_title=None, rows=None, item_keys=None):
         sw = SelectDialog(**locals())
-        sw.show()
         if sw.exec_():
             if item_keys is None:
                 return sw.index

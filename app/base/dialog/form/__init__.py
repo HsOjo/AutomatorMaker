@@ -45,7 +45,6 @@ class FormDialog(QDialog, FormView):
     @staticmethod
     def input(fields: List[BaseField], title=None):
         fd = FormDialog(**locals())
-        fd.show()
         if fd.exec_():
             return fd.data
 
