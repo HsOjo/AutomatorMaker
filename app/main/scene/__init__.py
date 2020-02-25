@@ -34,6 +34,14 @@ class SceneWidget(GraphicsWidget):
     def current_editor(self) -> BaseEditor:
         return self._editors[self._currnet_editor]
 
+    @property
+    def scene(self):
+        return self._scene
+
+    @property
+    def current_object(self):
+        return self._object_editor.current_object
+
     def callback_update(self):
         self.current_editor.update()
 

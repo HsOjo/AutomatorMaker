@@ -51,11 +51,11 @@ class SelectDialog(QDialog, SelectorView):
     def select(parent=None, title=None, cols_title=None, rows=None, item_keys=None):
         sw = SelectDialog(**locals())
         sw.show()
-        sw.exec_()
-        if item_keys is None:
-            return sw.index
-        else:
-            return sw.item
+        if sw.exec_():
+            if item_keys is None:
+                return sw.index
+            else:
+                return sw.item
 
     @property
     def index(self):
@@ -73,3 +73,10 @@ class SelectDialog(QDialog, SelectorView):
             return item
         else:
             return None
+
+    def _callback_accepted(self):
+        self.close()
+
+    def _callback_rejected(self):
+        self.close()
+

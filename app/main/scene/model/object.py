@@ -10,6 +10,9 @@ class ObjectModel(BaseModel):
     )
 
     TYPE_BUTTON = 0
+    ALL_TYPES = {
+        'Button': TYPE_BUTTON,
+    }
 
     def __init__(self):
         self.name = ''

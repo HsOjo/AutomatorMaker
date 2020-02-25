@@ -51,6 +51,7 @@ class AdvanceRect(Rect):
             self._color_focus = focus
         if unfocus is not None:
             self._color_unfocus = unfocus
+        self.set_color(focus if self._focus else unfocus)
 
     def set_focus(self, b: bool):
         self._focus = b

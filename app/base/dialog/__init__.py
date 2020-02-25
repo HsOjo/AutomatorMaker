@@ -1,1 +1,1 @@
-from .select import SelectDialog
+from .selector import SelectDialog

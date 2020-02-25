@@ -1,10 +1,10 @@
 class BaseView:
     def __init__(self):
         self.setupUi(self)
-        self.callback_init()
+        self._callback_init()
         self.register_callback()
 
-    def callback_init(self):
+    def _callback_init(self):
         pass
 
     def register_callback(self):

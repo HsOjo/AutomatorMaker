@@ -11,6 +11,9 @@ from .scene.model import SceneModel, FeatureModel, ObjectModel, ActionModel
 from .view import MainWindowView
 from .. import BaseApplication
 from ..base.common import try_exec
+from ..base.dialog.form import FormDialog
+from ..base.dialog.form.field import StringField, RectField, SelectField
+from ..base.dialog.form.field.range import RangeField
 from ..base.helper import TableHelper
 
 
@@ -39,10 +42,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         self._auto_save = True
         self._device = None  # type: Device
         self._debug = '--debug' in sys.argv
-
-        super().__init__(app)
-
-        self.scene_widget.register_event(
+        self._event = dict(
             debug=lambda: self._debug,
             process_events=lambda: self.app.processEvents(),
             sync_features=self.sync_features,
@@ -52,6 +52,10 @@ class MainWindow(BaseMainWindow, MainWindowView):
             select_object=lambda i: self.select_item(self.TYPE_OBJECT, i),
             select_action=lambda i: self.select_item(self.TYPE_ACTION, i),
         )
+
+        super().__init__(app)
+
+        self.scene_widget.register_event(**self._event)
 
         if self._debug:
             self._project = Project.open('./test')
@@ -133,7 +137,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             self._project.save()
 
     @_auto_save
-    def _callback_capture_triggered(self, b: bool):
+    def _callback_capture_scene_triggered(self, b: bool):
         if self._project is None:
             QMessageBox.information(self, self.tr('Error'), self.tr('Open Project First!'))
             return
@@ -175,6 +179,44 @@ class MainWindow(BaseMainWindow, MainWindowView):
                 if self._project.rename_scene(item.text(), text):
                     item.setText(text)
 
+    @_auto_save
+    def _callback_edit_item(self, item):
+        if isinstance(item, FeatureModel):
+            data = FormDialog.input([
+                StringField('name', item.name, title=self.tr('Name')),
+                RectField('rect', item.rect, title=self.tr('Rect')),
+                RangeField(
+                    'detect_weight', item.detect_weight,
+                    min=item.DETECT_WEIGHT_MIN, max=item.DETECT_WEIGHT_MAX,
+                    title=self.tr('Detect Weight')
+                ),
+            ], self.tr('Edit Feature'))
+            item.load_data(**data)
+            self.sync_features(self.scene_widget.scene.features)
+        elif isinstance(item, ObjectModel):
+            data = FormDialog.input([
+                StringField('name', item.name, title=self.tr('Name')),
+                RectField('rect', item.rect, title=self.tr('Rect')),
+                SelectField('type', options=item.ALL_TYPES, value=item.type, title=self.tr('Type')),
+            ], self.tr('Edit Object'))
+            item.load_data(**data)
+            self.sync_objects(self.scene_widget.scene.objects)
+        elif isinstance(item, ActionModel):
+            data = FormDialog.input([
+                StringField('name', item.name, title=self.tr('Name')),
+                SelectField('type', options=item.ALL_TYPES, value=item.type, title=self.tr('Type')),
+                SelectField(
+                    'dest_scene', options=[scene.name for scene in self.project.scenes],
+                    value=item.dest_scene, title=self.tr('Type')
+                ),
+            ], self.tr('Edit Action'))
+            item.load_data(**data)
+            self.sync_actions(self.scene_widget.current_object.actions)
+
+    @_auto_save
+    def _callback_delete_item_triggered(self, index):
+        pass
+
     def _callback_scene_changed(self, current: str, previous: str):
         # Reset tab, if in actions.
         if self.tabWidgetScene.currentIndex() == self.TAB_ACTIONS:
@@ -186,14 +228,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
             self.sync_scene(scene)
 
     def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
-        b = self.scene_widget.set_current_editor(current)
-        if current == self.TAB_ACTIONS:
-            TableHelper.auto_inject_columns_width(self.tableWidgetActions)
-        elif current == self.TAB_OBJECTS:
-            TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
-        elif current == self.TAB_FEATURES:
-            TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
-        return b
+        super()._callback_scene_tab_changed(current, previous)
+        return self.scene_widget.set_current_editor(current)
 
     def showEvent(self, *args):
         super().showEvent(*args)
