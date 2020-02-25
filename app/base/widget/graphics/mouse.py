@@ -46,8 +46,20 @@ class MouseButton:
         return self._click_distance
 
     @property
+    def down_position(self):
+        return self._down_pos
+
+    @property
+    def release_position(self):
+        return self._release_pos
+
+    @property
     def press_time(self):
         return time.time() - self._down_time
+
+    @property
+    def press_distance(self):
+        return point_distance(*self._down_pos, *self._position)
 
     @down.setter
     def down(self, b: bool):

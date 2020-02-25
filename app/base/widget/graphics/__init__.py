@@ -4,8 +4,10 @@ from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPainter, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QWidget
 
+from .circle import Circle
 from .factory import Factory
 from .font import Font
+from .line import Line
 from .mouse import Mouse
 from .node import Node
 from .rect import Rect

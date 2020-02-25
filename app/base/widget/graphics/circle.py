@@ -25,6 +25,12 @@ class Circle(Node):
         return self._radius
 
     def draw(self):
+        super().draw()
+        s = self.scale
         p = self.painter
         r = self._radius
-        p.drawEllipse(*self.position, r, r)
+        if s == 1:
+            p.drawEllipse(*self.position, r, r)
+        else:
+            r = r * s
+            p.drawEllipse(self.x * s, self.y * s, r, r)

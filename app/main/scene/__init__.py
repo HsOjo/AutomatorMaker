@@ -12,7 +12,7 @@ class SceneWidget(GraphicsWidget):
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent, **kwargs)
-        # self.set_antialiasing(True)
+        self.set_antialiasing(True)
 
         self.screen = self.new.sprite()
         self.rect_base = self.new.rect()
