@@ -9,7 +9,7 @@ class Rect(Node):
         self._rect = QRect(x, y, w, h)
 
     def copy(self):
-        rect = Rect(self.event, *self)
+        rect = self.__class__(self.event, *self)
         rect.set_color(self._color)
         rect.set_scale_available(self._scale_available)
         return rect

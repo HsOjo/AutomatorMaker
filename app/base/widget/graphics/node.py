@@ -42,6 +42,10 @@ class Node:
         return self._color
 
     @property
+    def scale_available(self):
+        return self._scale_available
+
+    @property
     def scale(self) -> float:
         return self._event['scale']() if self._scale_available else 1
 
