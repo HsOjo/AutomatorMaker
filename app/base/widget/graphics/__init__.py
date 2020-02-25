@@ -37,6 +37,7 @@ class GraphicsWidget(QWidget):
         self._frame_count_p = 0
         self._frame_time = 0
         self._scale = 1
+        self._antialiasing = False
 
         self._event = dict(
             painter=lambda: self._painter,
@@ -71,6 +72,9 @@ class GraphicsWidget(QWidget):
 
     def register_event(self, **kwargs):
         self._event.update(**kwargs)
+
+    def set_antialiasing(self, b: bool):
+        self._antialiasing = b
 
     def set_scale(self, scale: float):
         self._scale = scale
@@ -176,6 +180,8 @@ class GraphicsWidget(QWidget):
     def paintEvent(self, *args):
         super().paintEvent(*args)
         self._painter = QPainter(self)
+        if self._antialiasing:
+            self._painter.setRenderHint(QPainter.Antialiasing)
         if not self._painter.isActive():
             self._painter.begin(self)
         self.callback_draw()

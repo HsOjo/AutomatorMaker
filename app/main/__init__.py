@@ -179,7 +179,6 @@ class MainWindow(BaseMainWindow, MainWindowView):
                 if self._project.rename_scene(item.text(), text):
                     item.setText(text)
 
-    @_auto_save
     def _callback_edit_item(self, item):
         self.scene_widget.set_pause(True)
         if isinstance(item, FeatureModel):
@@ -194,7 +193,6 @@ class MainWindow(BaseMainWindow, MainWindowView):
             ], self.tr('Edit Feature'))
             if data is not None:
                 item.load_data(**data)
-                self.scene_widget.callback_item_edited(item)
                 self.sync_features(self.scene_widget.scene.features)
         elif isinstance(item, ObjectModel):
             data = FormDialog.input([
@@ -204,7 +202,6 @@ class MainWindow(BaseMainWindow, MainWindowView):
             ], self.tr('Edit Object'))
             if data is not None:
                 item.load_data(**data)
-                self.scene_widget.callback_item_edited(item)
                 self.sync_objects(self.scene_widget.scene.objects)
         elif isinstance(item, ActionModel):
             data = FormDialog.input([
@@ -217,13 +214,24 @@ class MainWindow(BaseMainWindow, MainWindowView):
             ], self.tr('Edit Action'))
             if data is not None:
                 item.load_data(**data)
-                self.scene_widget.callback_item_edited(item)
                 self.sync_actions(self.scene_widget.current_object.actions)
+        else:
+            raise Exception('Unsupport Item: %s' % item)
+
+        self.scene_widget.callback_item_edited(item)
         self.scene_widget.set_pause(False)
 
-    @_auto_save
-    def _callback_delete_item_triggered(self, index):
-        pass
+    def _callback_delete_item(self, item):
+        self.scene_widget.callback_item_deleted(item)
+        tab_index = self.tabWidgetScene.currentIndex()
+        items = self.current_items
+        items.remove(item)
+        if tab_index == self.TAB_FEATURES:
+            self.sync_features(items)
+        elif tab_index == self.TAB_OBJECTS:
+            self.sync_objects(items)
+        elif tab_index == self.TAB_ACTIONS:
+            self.sync_actions(items)
 
     def _callback_scene_changed(self, current: str, previous: str):
         # Reset tab, if in actions.

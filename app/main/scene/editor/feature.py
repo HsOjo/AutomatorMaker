@@ -5,15 +5,6 @@ from ..model import FeatureModel
 from ..object import AdvanceRect
 
 
-def _sync(func):
-    def wrapper(self: 'FeatureEditor', *args, **kwargs):
-        result = func(self, *args, **kwargs)
-        self.sync()
-        return result
-
-    return wrapper
-
-
 class FeatureEditor(RectEditor):
     def __init__(self, event):
         super().__init__(event)
@@ -38,7 +29,6 @@ class FeatureEditor(RectEditor):
         if sync and rect in self._rects:
             self.event['select_feature'](self.rects.index(rect))
 
-    @_sync
     def add_item(self, rect):
         if self._features is None:
             return False
@@ -54,15 +44,18 @@ class FeatureEditor(RectEditor):
         feature.rect = [*rect]
         self._rects[rect] = feature
         self._features.append(feature)
+        self.sync()
         return True
 
-    @_sync
     def callback_rect_moving(self, rect_moving: AdvanceRect, moving):
         super().callback_rect_moving(rect_moving, moving)
+        if not moving:
+            self.sync()
 
-    @_sync
     def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
         super().callback_adjust(rect_adjust, adjust)
+        if not adjust:
+            self.sync()
 
     def sync(self):
         if self._features is None:

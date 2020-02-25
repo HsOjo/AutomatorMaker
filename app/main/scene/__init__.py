@@ -12,6 +12,7 @@ class SceneWidget(GraphicsWidget):
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent, **kwargs)
+        # self.set_antialiasing(True)
 
         self.screen = self.new.sprite()
         self.rect_base = self.new.rect()
@@ -98,3 +99,6 @@ class SceneWidget(GraphicsWidget):
 
     def callback_item_edited(self, item):
         self.current_editor.callback_item_edited(item)
+
+    def callback_item_deleted(self, item):
+        self.current_editor.callback_item_deleted(item)

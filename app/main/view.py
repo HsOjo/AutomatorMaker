@@ -1,4 +1,3 @@
-from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QSizePolicy
 
 from app.base import BaseView
@@ -45,6 +44,7 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.tableWidgetFeatures.itemDoubleClicked.connect(lambda x: self._callback_edit_item_triggered(x.row()))
         self.tableWidgetObjects.itemDoubleClicked.connect(lambda x: self._callback_edit_item_triggered(x.row()))
         self.tableWidgetActions.itemDoubleClicked.connect(lambda x: self._callback_edit_item_triggered(x.row()))
+        self.tableWidgetScenes.itemDoubleClicked.connect(lambda _: self._callback_rename_scene_triggered(True))
 
     def _callback_open_triggered(self, b: bool):
         pass
@@ -98,39 +98,67 @@ class MainWindowView(Ui_MainWindow, BaseView):
     def _callback_edit_item(self, item):
         pass
 
-    def _callback_edit_item_triggered(self, index):
-        scene = self.scene_widget.scene
-        if index == -1 or scene is None:
-            return
+    def _callback_delete_item(self, item):
+        pass
 
+    def _callback_edit_item_triggered(self, index):
+        item = self.current_item
+        if index == -1 or item is None:
+            return
+        self._callback_edit_item(item)
+
+    def _callback_delete_item_triggered(self, index):
+        item = self.current_item
+        if index == -1 or item is None:
+            return
+        self._callback_delete_item(item)
+
+    @property
+    def current_item(self):
+        items, index = self.current_items, self.current_item_index
+        if items is None or index is None:
+            return None
+        if 0 <= index < len(items):
+            return items[index]
+        else:
+            return None
+
+    @property
+    def current_items(self):
+        # Fix Qt init crash.
+        sw = getattr(self, 'scene_widget', None)  # type: SceneWidget
+        if sw is None or sw.scene is None:
+            return None
+        scene = sw.scene
         tab_index = self.tabWidgetScene.currentIndex()
+        items = None
         if tab_index == self.TAB_FEATURES:
-            index = self.tableWidgetFeatures.currentRow()
-            feature = scene.features[index]
-            self._callback_edit_item(feature)
+            items = scene.features
         elif tab_index == self.TAB_OBJECTS:
-            index = self.tableWidgetObjects.currentRow()
-            object_ = scene.objects[index]
-            self._callback_edit_item(object_)
+            items = scene.objects
         elif tab_index == self.TAB_ACTIONS:
             object_ = self.scene_widget.current_object
             if object_ is None:
                 return
-            index = self.tableWidgetActions.currentRow()
-            action = object_.actions[index]
-            self._callback_edit_item(action)
+            items = object_.actions
 
-    def _callback_delete_item_triggered(self, index):
-        pass
+        return items
 
     @property
     def current_item_index(self):
         index = -1
+        if self.current_table_widget is not None:
+            index = self.current_table_widget.currentRow()
+        return index
+
+    @property
+    def current_table_widget(self):
+        widget = None
         tab_index = self.tabWidgetScene.currentIndex()
         if tab_index == self.TAB_FEATURES:
-            index = self.tableWidgetFeatures.currentIndex()
+            widget = self.tableWidgetFeatures
         elif tab_index == self.TAB_OBJECTS:
-            index = self.tableWidgetObjects.currentIndex()
+            widget = self.tableWidgetObjects
         elif tab_index == self.TAB_ACTIONS:
-            index = self.tableWidgetActions.currentIndex()
-        return index
+            widget = self.tableWidgetActions
+        return widget

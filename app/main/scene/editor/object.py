@@ -5,15 +5,6 @@ from ..model import ObjectModel
 from ..object import AdvanceRect
 
 
-def _sync(func):
-    def wrapper(self: 'ObjectEditor', *args, **kwargs):
-        result = func(self, *args, **kwargs)
-        self.sync()
-        return result
-
-    return wrapper
-
-
 class ObjectEditor(RectEditor):
     def __init__(self, event):
         super().__init__(event)
@@ -38,7 +29,6 @@ class ObjectEditor(RectEditor):
         if sync and rect in self._rects:
             self.event['select_object'](self.rects.index(rect))
 
-    @_sync
     def add_item(self, rect):
         if self._objects is None:
             return False
@@ -54,15 +44,18 @@ class ObjectEditor(RectEditor):
         object.rect = [*rect]
         self._rects[rect] = object
         self._objects.append(object)
+        self.sync()
         return True
 
-    @_sync
     def callback_rect_moving(self, rect_moving: AdvanceRect, moving):
         super().callback_rect_moving(rect_moving, moving)
+        if moving:
+            self.sync()
 
-    @_sync
     def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
         super().callback_adjust(rect_adjust, adjust)
+        if adjust:
+            self.sync()
 
     def sync(self):
         if self._objects is None:

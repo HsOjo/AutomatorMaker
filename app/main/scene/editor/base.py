@@ -21,3 +21,6 @@ class BaseEditor:
 
     def callback_item_edited(self, item):
         pass
+
+    def callback_item_deleted(self, item):
+        pass

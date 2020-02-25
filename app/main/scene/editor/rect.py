@@ -32,6 +32,7 @@ class RectEditor(BaseEditor):
             self.set_current_rect(rects[index], sync=False)
 
     def set_current_rect(self, rect, sync=True):
+        # sync param use by overwrite function.
         if self._current_rect is not None:
             self._current_rect.set_color(self.COLOR_UNFOCUS)
             self._current_rect.set_focus(False)
@@ -40,9 +41,6 @@ class RectEditor(BaseEditor):
         if rect is not None:
             rect.set_color(self.COLOR_NEW if rect == self._new_rect else self.COLOR_FOCUS)
             rect.set_focus(True)
-
-        if sync and rect in self._rects:
-            self.event['select_feature'](self.rects.index(rect))
 
     def update(self):
         mouse = self.mouse
@@ -105,7 +103,8 @@ class RectEditor(BaseEditor):
                     rect.set_color(self.COLOR_UNFOCUS)
 
     def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
-        pass
+        if not adjust:
+            rect_adjust.set_size(*rect_adjust.size, convert_negative=True)
 
     def callback_item_edited(self, edited_item):
         for rect, item in self._rects.items():
@@ -114,3 +113,12 @@ class RectEditor(BaseEditor):
                 rect.set_position(x, y)
                 rect.set_size(w, h)
                 rect.adjuster.adjust(rect)
+                break
+
+    def callback_item_deleted(self, deleted_item):
+        for rect, item in self._rects.items():
+            if deleted_item == item:
+                self._rects.pop(rect)
+                if rect == self._current_rect:
+                    self.set_current_rect(None)
+                break
