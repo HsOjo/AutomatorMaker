@@ -106,3 +106,11 @@ class RectEditor(BaseEditor):
 
     def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
         pass
+
+    def callback_item_edited(self, edited_item):
+        for rect, item in self._rects.items():
+            if edited_item == item:
+                x, y, w, h = item.rect
+                rect.set_position(x, y)
+                rect.set_size(w, h)
+                rect.adjuster.adjust(rect)

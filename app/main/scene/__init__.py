@@ -94,3 +94,6 @@ class SceneWidget(GraphicsWidget):
     def callback_select_action(self, index):
         if self.current_object is None:
             return
+
+    def callback_item_edited(self, item):
+        self.current_editor.callback_item_edited(item)

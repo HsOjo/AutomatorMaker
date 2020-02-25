@@ -18,3 +18,6 @@ class BaseEditor:
 
     def draw(self):
         pass
+
+    def callback_item_edited(self, item):
+        pass

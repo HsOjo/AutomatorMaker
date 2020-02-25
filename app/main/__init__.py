@@ -194,6 +194,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             ], self.tr('Edit Feature'))
             if data is not None:
                 item.load_data(**data)
+                self.scene_widget.callback_item_edited(item)
                 self.sync_features(self.scene_widget.scene.features)
         elif isinstance(item, ObjectModel):
             data = FormDialog.input([
@@ -203,6 +204,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             ], self.tr('Edit Object'))
             if data is not None:
                 item.load_data(**data)
+                self.scene_widget.callback_item_edited(item)
                 self.sync_objects(self.scene_widget.scene.objects)
         elif isinstance(item, ActionModel):
             data = FormDialog.input([
@@ -215,6 +217,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             ], self.tr('Edit Action'))
             if data is not None:
                 item.load_data(**data)
+                self.scene_widget.callback_item_edited(item)
                 self.sync_actions(self.scene_widget.current_object.actions)
         self.scene_widget.set_pause(False)
 

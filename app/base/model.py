@@ -5,7 +5,10 @@ class BaseModel:
     @property
     def data(self):
         data = {}
-        for k in dir(self):
+        ks = dir(self)
+        for k in dir(self.__class__):
+            ks.remove(k)
+        for k in ks:
             if k[0] != '_' and k != 'data' and k not in self._ignore_attrs:
                 v = getattr(self, k)
                 if isinstance(v, BaseModel):
