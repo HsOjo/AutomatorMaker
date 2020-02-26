@@ -1,12 +1,14 @@
+from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QColor
 
 
 class BaseOperation:
     def __init__(self, event):
         self._event = event
+        self._origin = QPoint()
         self._color_focus = QColor(255, 128, 0)
         self._color_unfocus = QColor(255, 255, 0)
-        self._callback_modified = None
+        self._callback_moving = None
 
     def update(self):
         pass
@@ -22,10 +24,10 @@ class BaseOperation:
     def params(self) -> dict:
         return {}
 
-    def load_params(self, **params):
-        for k, v in params.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
+    def load_params(self, origin, **params):
+        x, y = origin
+        self._origin.setX(x)
+        self._origin.setY(y)
 
     @property
     def moving(self):
@@ -43,6 +45,9 @@ class BaseOperation:
     def color_unfocus(self):
         return self._color_unfocus
 
+    def set_color(self, color=None):
+        pass
+
     def set_focus_color(self, focus=None, unfocus=None):
         pass
 
@@ -52,10 +57,9 @@ class BaseOperation:
     def check_point(self, x, y):
         return False
 
-    def set_callback_modified(self, func):
-        self._callback_modified = func
+    def set_callback_moving(self, func):
+        self._callback_moving = func
 
-    def _sub_callback_modified(self):
-        func = self._callback_modified
-        if func is not None:
-            func(self)
+    def _sub_callback_moving(self, moving):
+        if self._callback_moving is not None:
+            self._callback_moving(self, moving)

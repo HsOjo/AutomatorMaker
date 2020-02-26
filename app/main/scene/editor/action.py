@@ -2,7 +2,7 @@ from typing import List, Dict
 
 from PyQt5.QtGui import QColor
 
-from app.base.widget.graphics import Font
+from app.utils import list_math
 from .base import BaseEditor
 from ..model import ActionModel, ObjectModel
 from ..object import ObjectRect, MouseIndicator
@@ -40,6 +40,7 @@ class ActionEditor(BaseEditor):
                                                self.RADIUS_MOUSE_CIRCLE, self.TIME_PRESS, self.DISTANCE_SWIPE)
 
         self._object = None  # type: ObjectModel
+        self._object_origin = None  # type: List[int]
         self._object_rect = ObjectRect(event)
         self._object_rect.set_color(self.COLOR_OBJECT)
 
@@ -50,6 +51,8 @@ class ActionEditor(BaseEditor):
         actions = object_.actions
         self._actions = actions
         self._object = object_
+        x, y, w, h = self._object.rect
+        self._object_origin = [x + w / 2, y + h / 2]
 
         x, y, w, h = object_.rect
         self._object_rect.set_position(x, y)
@@ -58,7 +61,7 @@ class ActionEditor(BaseEditor):
         operations = {}
         for action in actions:
             operation = self.new_operation(action.type, action.params, sync=False)
-            operation.load_params(**action.params)
+            operation.load_params(self._object_origin, **action.params)
             operations[operation] = action
         self._operations = operations
         self.set_current_operation(None, False)
@@ -97,6 +100,7 @@ class ActionEditor(BaseEditor):
                 cc = mouse_l.click_count_last
                 if cc > 1:
                     dx, dy = mouse_l.down_position
+                    dx, dy = list_math.reduce([dx, dy], self._object_origin)
                     self.new_operation(ActionModel.TYPE_TAP, dict(
                         x=dx, y=dy, count=cc
                     ))
@@ -106,6 +110,8 @@ class ActionEditor(BaseEditor):
                     cd = mouse_l.click_distance
                     dx, dy = mouse_l.down_position
                     rx, ry = mouse_l.release_position
+                    dx, dy = list_math.reduce([dx, dy], self._object_origin)
+                    rx, ry = list_math.reduce([rx, ry], self._object_origin)
                     if cd > self.DISTANCE_SWIPE:
                         self.new_operation(ActionModel.TYPE_SWIPE, dict(
                             start_x=dx, start_y=dy,
@@ -151,8 +157,8 @@ class ActionEditor(BaseEditor):
         operation = None
         if operation_cls is not None:
             operation = operation_cls(self._event)
-            operation.load_params(**params)
-            operation.set_callback_modified(self.callback_operation_modified)
+            operation.load_params(self._object_origin, **params)
+            operation.set_callback_moving(self.callback_operation_moving)
             operation.set_focus_color(self.COLOR_FOCUS, self.COLOR_UNFOCUS)
             if isinstance(operation, TapOperation):
                 operation.circle.set_radius(self.RADIUS_TAP_CIRCLE)
@@ -194,6 +200,17 @@ class ActionEditor(BaseEditor):
     def callback_operation_modified(self, operation_modified: BaseOperation):
         self.sync()
 
+    def callback_operation_moving(self, operation_moving: BaseOperation, moving):
+        if not moving:
+            self.callback_operation_modified(operation_moving)
+        for operation in self._operations:
+            if moving:
+                if operation != operation_moving:
+                    operation.set_color(self.COLOR_UNFOCUS_MOVING)
+            else:
+                if operation != operation_moving:
+                    operation.set_color(self.COLOR_UNFOCUS)
+
     def sync(self):
         if self._actions is None:
             return
@@ -207,7 +224,7 @@ class ActionEditor(BaseEditor):
     def callback_item_edited(self, edited_item):
         for operation, item in self._operations.items():
             if edited_item == item:
-                operation.load_params(**item.params)
+                operation.load_params(self._object_origin, **item.params)
                 break
 
     def callback_item_deleted(self, deleted_item):

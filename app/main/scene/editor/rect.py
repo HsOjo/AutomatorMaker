@@ -96,6 +96,8 @@ class RectEditor(BaseEditor):
         pass
 
     def callback_rect_moving(self, rect_moving: AdvanceRect, moving: bool):
+        if not moving:
+            self.callback_rect_modified(rect_moving)
         for rect in self._rects:
             if moving:
                 if rect != rect_moving:
@@ -103,7 +105,6 @@ class RectEditor(BaseEditor):
             else:
                 if rect != rect_moving:
                     rect.set_color(self.COLOR_UNFOCUS)
-                self.callback_rect_modified(rect_moving)
 
     def callback_rect_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
         if not adjust:

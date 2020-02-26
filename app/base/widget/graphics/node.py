@@ -63,8 +63,9 @@ class Node:
             self._position.setY(y)
 
     def set_color(self, color: QColor):
-        self._color = color
-        self._pen.setColor(color)
+        if color is not None:
+            self._color = color
+            self._pen.setColor(color)
 
     def draw(self):
         p = self.painter

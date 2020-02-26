@@ -53,7 +53,7 @@ class RectAdjuster:
             if self._adjuster == self._lu:
                 self._rect.set_position(*mouse.position)
                 self._rect.set_size(*list_math.add(
-                    self._rect_bak.size, list_math.reduce(self._rect_bak._position, mouse.position)
+                    self._rect_bak.size, list_math.reduce(self._rect_bak.position, mouse.position)
                 ))
             elif self._adjuster == self._u:
                 self._rect.set_position(y=mouse.y)

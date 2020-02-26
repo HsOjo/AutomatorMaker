@@ -12,8 +12,8 @@ class SwipeOperation(BaseOperation):
         self._font.set_text('Swipe')
         self._circle_start = AdvanceCircle(event)
         self._circle_end = AdvanceCircle(event)
-        self._circle_start.set_callback_moving(lambda moving: self._sub_callback_modified() if not moving else None)
-        self._circle_end.set_callback_moving(lambda moving: self._sub_callback_modified() if not moving else None)
+        self._circle_start.set_callback_moving(self._sub_callback_moving)
+        self._circle_end.set_callback_moving(self._sub_callback_moving)
         self._line_link = Line(event)
         self._time = 1
 
@@ -51,19 +51,22 @@ class SwipeOperation(BaseOperation):
 
     @property
     def params(self) -> dict:
+        ox, oy = self._origin.x(), self._origin.y()
         return dict(
-            start_x=self._circle_start.x,
-            start_y=self._circle_start.y,
-            end_x=self._circle_end.x,
-            end_y=self._circle_end.y,
+            start_x=self._circle_start.x - ox,
+            start_y=self._circle_start.y - oy,
+            end_x=self._circle_end.x - ox,
+            end_y=self._circle_end.y - oy,
             time=self._time,
         )
 
-    def load_params(self, **params):
-        start_x = params.get('start_x')
-        start_y = params.get('start_y')
-        end_x = params.get('end_x')
-        end_y = params.get('end_y')
+    def load_params(self, origin, **params):
+        super().load_params(origin, **params)
+        ox, oy = self._origin.x(), self._origin.y()
+        start_x = params.get('start_x') + ox
+        start_y = params.get('start_y') + oy
+        end_x = params.get('end_x') + ox
+        end_y = params.get('end_y') + oy
         self._time = params.get('time', self._time)
         self._circle_start.set_position(start_x, start_y)
         self._circle_end.set_position(end_x, end_y)
@@ -82,3 +85,7 @@ class SwipeOperation(BaseOperation):
     def set_focus_color(self, focus=None, unfocus=None):
         self._circle_start.set_focus_color(focus, unfocus)
         self._circle_end.set_focus_color(focus, unfocus)
+
+    def set_color(self, color=None):
+        self._circle_start.set_color(color)
+        self._circle_end.set_color(color)

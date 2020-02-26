@@ -1,5 +1,4 @@
 from .tap import TapOperation
-from ..advance_circle import AdvanceCircle
 
 
 class PressOperation(TapOperation):
@@ -16,6 +15,6 @@ class PressOperation(TapOperation):
         )
         return params
 
-    def load_params(self, **params):
-        super().load_params(**params)
+    def load_params(self, origin, **params):
+        super().load_params(origin, **params)
         self._time = params.get('time', self._time)

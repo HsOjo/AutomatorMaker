@@ -11,7 +11,7 @@ class TapOperation(BaseOperation):
         self._font = Font(event)
         self._font.set_text('Tap')
         self._circle = AdvanceCircle(event)
-        self._circle.set_callback_moving(lambda moving: self._sub_callback_modified() if not moving else None)
+        self._circle.set_callback_moving(self._sub_callback_moving)
 
     @property
     def circle(self):
@@ -29,14 +29,15 @@ class TapOperation(BaseOperation):
     @property
     def params(self) -> dict:
         return dict(
-            x=self._circle.x,
-            y=self._circle.y,
+            x=self._circle.x - self._origin.x(),
+            y=self._circle.y - self._origin.y(),
             count=self._count,
         )
 
-    def load_params(self, **params):
-        x = params.get('x')
-        y = params.get('y')
+    def load_params(self, origin, **params):
+        super().load_params(origin, **params)
+        x = params.get('x') + self._origin.x()
+        y = params.get('y') + self._origin.y()
         self._circle.set_position(x, y)
         self._count = params.get('count')
 
@@ -52,3 +53,6 @@ class TapOperation(BaseOperation):
 
     def set_focus_color(self, focus=None, unfocus=None):
         self._circle.set_focus_color(focus, unfocus)
+
+    def set_color(self, color=None):
+        self._circle.set_color(color)
