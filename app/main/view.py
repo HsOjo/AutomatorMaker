@@ -28,6 +28,7 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.actionSave.triggered.connect(self._callback_save_triggered)
         self.actionSelectDevice.triggered.connect(self._callback_select_device_triggered)
         self.actionRenameScene.triggered.connect(self._callback_rename_scene_triggered)
+        self.actionRemoveScene.triggered.connect(self._callback_remove_scene_triggered)
         self.actionEditItem.triggered.connect(lambda: self._callback_edit_item_triggered(self.current_item_index))
         self.actionDeleteItem.triggered.connect(lambda: self._callback_delete_item_triggered(self.current_item_index))
         self.actionSetItemParams.triggered.connect(self._callback_set_item_params_triggered)
@@ -63,6 +64,9 @@ class MainWindowView(Ui_MainWindow, BaseView):
         pass
 
     def _callback_rename_scene_triggered(self, b: bool):
+        pass
+
+    def _callback_remove_scene_triggered(self, b: bool):
         pass
 
     def _callback_set_item_params_triggered(self, b: bool):

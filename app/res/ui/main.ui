@@ -402,6 +402,7 @@
     </property>
     <addaction name="actionCaptureScene"/>
     <addaction name="actionRenameScene"/>
+    <addaction name="actionRemoveScene"/>
     <addaction name="separator"/>
     <addaction name="actionDeleteItem"/>
     <addaction name="actionEditItem"/>
@@ -481,6 +482,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionRemoveScene">
+   <property name="text">
+    <string>Remove Scene</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>

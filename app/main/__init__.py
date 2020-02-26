@@ -1,3 +1,4 @@
+import os
 import sys
 from typing import List
 
@@ -16,6 +17,7 @@ from ..base.dialog.form import FormDialog
 from ..base.dialog.form.field import StringField, RectField, SelectField
 from ..base.dialog.form.field.range import RangeField
 from ..base.helper import TableHelper
+from ..config import Config
 
 
 def _auto_save(func):
@@ -39,6 +41,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
     TYPE_ACTION = 2
 
     def __init__(self, app: BaseApplication):
+        self._config = Config()
+        self._config._config_path = os.path.expanduser('~/.automator_maker.json')
         self._project = None  # type: Project
         self._auto_save = True
         self._device = None  # type: Device
@@ -57,6 +61,17 @@ class MainWindow(BaseMainWindow, MainWindowView):
 
         super().__init__(app)
         self.scene_widget.register_event(**self._event)
+
+        app_shell = get_app_shell()
+        self._adb = PyADB('%s/app/res/libs/adb' % app_shell.get_runtime_dir())
+        if self._config.load():
+            self._device = self._adb.devices.get(self._config.device)
+            project_dir = self._config.project
+            if project_dir != '' and os.path.exists(project_dir) and os.path.isdir(project_dir):
+                project = Project.open(project_dir)
+                if project is not None:
+                    self._project = project
+                    self.sync_scenes()
 
     @property
     def project(self):
@@ -126,6 +141,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
         if project is not None:
             self._project = project
             self.sync_scenes()
+            self._config.project = directory
+            self._config.save()
 
     @try_exec(show=True)
     def _callback_save_triggered(self, b: bool):
@@ -141,19 +158,17 @@ class MainWindow(BaseMainWindow, MainWindowView):
             QMessageBox.information(self, self.tr('Error'), self.tr('Device Select First!'))
             return
 
-        text, b = QInputDialog.getText(self, self.tr('Capture New Scene'), self.tr('Please input scene name.'))
         img_data = self._device.display.screen_cap()
+        text, b = QInputDialog.getText(self, self.tr('Capture New Scene'), self.tr('Please input scene name.'))
         self._project.add_scene(img_data, text if b and text != '' else None)
         self.sync_scenes()
 
     def _callback_select_device_triggered(self, b: bool):
-        app_shell = get_app_shell()
-        adb = PyADB('%s/app/res/libs/adb' % app_shell.get_runtime_dir())
-        devices = adb.devices
+        devices = self._adb.devices
         if len(devices) == 0:
-            adb.kill_server()
-            adb.start_server()
-        devices = adb.devices
+            self._adb.kill_server()
+            self._adb.start_server()
+        devices = self._adb.devices
 
         item = SelectDialog.select(
             self, title=self.tr('Select Device'),
@@ -164,6 +179,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
 
         if item is not None:
             self._device = devices[item['sn']]
+            self._config.device = item['sn']
+            self._config.save()
 
     @_auto_save
     def _callback_rename_scene_triggered(self, b: bool):
@@ -175,6 +192,14 @@ class MainWindow(BaseMainWindow, MainWindowView):
             if b:
                 if self._project.rename_scene(item.text(), text):
                     item.setText(text)
+
+    @_auto_save
+    def _callback_remove_scene_triggered(self, b: bool):
+        index = self.tableWidgetScenes.currentRow()
+        if 0 <= index < self.tableWidgetScenes.rowCount():
+            item = self.tableWidgetScenes.item(index, 0)
+            self._project.remove_scene(item.text())
+            self.sync_scenes()
 
     def _callback_edit_item(self, item):
         self.scene_widget.set_pause(True)

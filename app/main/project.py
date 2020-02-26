@@ -84,3 +84,8 @@ class Project:
 
         with open(scene.img_path, 'wb') as io:
             io.write(img_data)
+
+    @try_exec(show=True, info_only=True)
+    def remove_scene(self, name):
+        scene = self.scenes.pop(name)  # type: SceneModel
+        os.unlink(scene.img_path)

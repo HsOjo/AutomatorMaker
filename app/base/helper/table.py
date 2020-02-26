@@ -50,7 +50,8 @@ class TableHelper:
             row_previous = previous.row() if previous is not None else -1
             if row_current != row_previous:
                 if primary_index is not None:
-                    name_current = table.item(row_current, primary_index).text()
+                    item = table.item(row_current, primary_index)
+                    name_current = item.text() if item is not None else None
                     name_previous = None
                     if previous is not None:
                         name_previous = table.item(row_previous, primary_index).text()
