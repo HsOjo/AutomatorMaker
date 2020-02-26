@@ -18,8 +18,17 @@ class BaseApplication(QApplication):
         print(exc, file=sys.stderr)
         QMessageBox.warning(self.main_window, 'Error', exc)
 
+    def hook_exception(self):
+        def boom(*_):
+            import traceback
+            exc = traceback.format_exc()
+            self.callback_catch(exc)
+
+        sys.excepthook = boom
+
     def run(self):
         try:
+            self.hook_exception()
             self.main_window = self.main_window_cls(self)
             self.main_window.show()
             return self.exec_()

@@ -3,6 +3,7 @@ from typing import List
 
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QInputDialog
 from pyadb import PyADB, Device
+from pyojo.tools.shell import get_app_shell
 
 from app.base import BaseMainWindow
 from app.base.dialog import SelectDialog
@@ -55,18 +56,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         )
 
         super().__init__(app)
-
         self.scene_widget.register_event(**self._event)
-
-        if self._debug:
-            self._project = Project.open('./test')
-            self._device = list(PyADB('/Users/hsojo/Library/Android/sdk/platform-tools/adb').devices.values())[0]
-            self.sync_scenes()
-            scene = list(self.project.scenes.values())[0]
-            self.sync_scene(scene)
-            self.scene_widget.set_scene(scene)
-            self.scene_widget.callback_select_object(0)
-            self.scene_widget.set_current_editor(self.scene_widget.EDIT_ACTION)
 
     @property
     def project(self):
@@ -157,7 +147,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
         self.sync_scenes()
 
     def _callback_select_device_triggered(self, b: bool):
-        adb = PyADB('/Users/hsojo/Library/Android/sdk/platform-tools/adb')
+        app_shell = get_app_shell()
+        adb = PyADB('%s/app/res/libs/adb' % app_shell.get_runtime_dir())
         devices = adb.devices
         if len(devices) == 0:
             adb.kill_server()
