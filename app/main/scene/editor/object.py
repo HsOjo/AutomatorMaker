@@ -47,15 +47,8 @@ class ObjectEditor(RectEditor):
         self.sync()
         return True
 
-    def callback_rect_moving(self, rect_moving: AdvanceRect, moving):
-        super().callback_rect_moving(rect_moving, moving)
-        if moving:
-            self.sync()
-
-    def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
-        super().callback_adjust(rect_adjust, adjust)
-        if adjust:
-            self.sync()
+    def callback_rect_modified(self, rect: AdvanceRect):
+        self.sync()
 
     def sync(self):
         if self._objects is None:

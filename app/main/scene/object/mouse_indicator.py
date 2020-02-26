@@ -35,13 +35,13 @@ class MouseIndicator:
 
             rn = p * self._radius
             self._circle_mouse.set_radius(rn)
-            r2 = self._circle_mouse.radius / 2
-            self._circle_mouse.set_position(mouse.x - r2, mouse.y - r2)
+            self._circle_mouse.set_position(mouse.x, mouse.y)
+            self._circle_mouse.set_origin()
 
             dx, dy = mouse_l.down_position
             self._circle_origin.set_radius(rn / 2)
-            r2 = self._circle_origin.radius / 2
-            self._circle_origin.set_position(dx - r2, dy - r2)
+            self._circle_origin.set_position(dx, dy)
+            self._circle_origin.set_origin()
 
             self._line_mouse.set_position_end(*mouse.position)
 

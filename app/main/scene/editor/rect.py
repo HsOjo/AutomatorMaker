@@ -17,8 +17,8 @@ class RectEditor(BaseEditor):
         super().__init__(event)
         self._rects = {}  # type: Dict[AdvanceRect]
         self._current_rect = None  # type: AdvanceRect
-        self._new_rect = Rect(self.event)
-        self._new_rect.set_color(self.COLOR_NEW)
+        self._new_rect = AdvanceRect(self.event)
+        self._new_rect.set_focus_color(self.COLOR_NEW, self.COLOR_NEW)
 
         self._creating = False
 
@@ -34,12 +34,10 @@ class RectEditor(BaseEditor):
     def set_current_rect(self, rect, sync=True):
         # sync param use by overwrite function.
         if self._current_rect is not None:
-            self._current_rect.set_color(self.COLOR_UNFOCUS)
             self._current_rect.set_focus(False)
 
         self._current_rect = rect
         if rect is not None:
-            rect.set_color(self.COLOR_NEW if rect == self._new_rect else self.COLOR_FOCUS)
             rect.set_focus(True)
 
     def update(self):
@@ -78,7 +76,7 @@ class RectEditor(BaseEditor):
         rect.set_size(*rect.size, convert_negative=True)
         rect.set_focus_color(self.COLOR_FOCUS, self.COLOR_UNFOCUS)
         rect.set_callback_moving(lambda b: self.callback_rect_moving(rect, b))
-        rect.adjuster.set_callback_adjust(lambda b: self.callback_adjust(rect, b))
+        rect.adjuster.set_callback_adjust(lambda b: self.callback_rect_adjust(rect, b))
         if sync and self.add_item(rect):
             self.set_current_rect(rect)
 
@@ -94,6 +92,9 @@ class RectEditor(BaseEditor):
         if self._creating:
             self._new_rect.draw()
 
+    def callback_rect_modified(self, rect: AdvanceRect):
+        pass
+
     def callback_rect_moving(self, rect_moving: AdvanceRect, moving: bool):
         for rect in self._rects:
             if moving:
@@ -102,10 +103,12 @@ class RectEditor(BaseEditor):
             else:
                 if rect != rect_moving:
                     rect.set_color(self.COLOR_UNFOCUS)
+                self.callback_rect_modified(rect_moving)
 
-    def callback_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
+    def callback_rect_adjust(self, rect_adjust: AdvanceRect, adjust: bool):
         if not adjust:
             rect_adjust.set_size(*rect_adjust.size, convert_negative=True)
+            self.callback_rect_modified(rect_adjust)
 
     def callback_item_edited(self, edited_item):
         for rect, item in self._rects.items():

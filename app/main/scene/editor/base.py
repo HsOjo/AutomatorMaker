@@ -13,6 +13,9 @@ class BaseEditor:
     def mouse(self) -> Mouse:
         return self._event['mouse']()
 
+    def select(self, index):
+        pass
+
     def update(self):
         pass
 
@@ -23,4 +26,10 @@ class BaseEditor:
         pass
 
     def callback_item_deleted(self, item):
+        pass
+
+    def add_item(self, item):
+        pass
+
+    def sync(self):
         pass

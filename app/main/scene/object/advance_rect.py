@@ -1,5 +1,3 @@
-from typing import List
-
 from PyQt5.QtGui import QColor
 
 from app.base.widget.graphics import Rect, Mouse
@@ -15,7 +13,6 @@ class AdvanceRect(Rect):
         self._adjuster.adjust(self)
         self._focus = False
         self._moving = False
-        self._move_origin = None  # type: List[int]
         self._backup = None  # type:AdvanceRect
         self._color_focus = QColor(255, 128, 0)
         self._color_unfocus = QColor(255, 255, 0)
@@ -69,7 +66,7 @@ class AdvanceRect(Rect):
             if not self._adjuster.adjusting:
                 if self._moving:
                     self.set_position(*list_math.add(
-                        self._backup.position, list_math.reduce(mouse.position, self._move_origin)
+                        self._backup.position, list_math.reduce(mouse.position, mouse_l.down_position)
                     ))
                     if mouse_l.release:
                         self._adjuster.adjust(self)
@@ -80,7 +77,6 @@ class AdvanceRect(Rect):
                     if mouse_l.down:
                         if self.check_point(*mouse.position):
                             self._backup = self.copy()
-                            self._move_origin = mouse.position
                             self._moving = True
                             if self._callback_moving is not None:
                                 self._callback_moving(self._moving)
