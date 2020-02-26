@@ -35,7 +35,11 @@ class FormDialog(QDialog, FormView):
             self.verticalLayoutInput.addLayout(layout)
         if title is not None:
             self.setWindowTitle(title)
-        self.resize(self.minimumSize())
+        ms = self.minimumSize()
+        ms.setWidth(max(ms.width(), 320))
+        ms.setHeight(max(ms.height(), len(fields) * 32, 240))
+        self.setMinimumSize(ms)
+        self.resize(ms)
 
     @property
     def data(self):

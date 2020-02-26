@@ -3,7 +3,7 @@ import time
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QMouseEvent
 
-from app.base.common import point_distance
+from ...utils import point_math
 
 
 class MouseButton:
@@ -76,7 +76,7 @@ class MouseButton:
 
     @property
     def press_distance(self):
-        return point_distance(*self._down_pos, *self._position)
+        return point_math.distance(*self._down_pos, *self._position)
 
     @down.setter
     def down(self, b: bool):
@@ -99,7 +99,7 @@ class MouseButton:
             else:
                 self._click_count = 1
             self._release_pos = self._position
-            self._click_distance = point_distance(*self._down_pos, *self._release_pos)
+            self._click_distance = point_math.distance(*self._down_pos, *self._release_pos)
         self._release = b
 
     def reset(self):

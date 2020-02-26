@@ -66,4 +66,4 @@ class AdvanceCircle(Circle):
                         if self._callback_moving is not None:
                             self._callback_moving(self._moving)
                     else:
-                        self._focus = False
+                        self.set_focus(False)

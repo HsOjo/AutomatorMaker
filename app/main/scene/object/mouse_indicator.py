@@ -1,3 +1,4 @@
+from app.base.utils import point_math
 from app.base.widget.graphics import Circle, Mouse
 from app.base.widget.graphics import Line
 
@@ -27,23 +28,21 @@ class MouseIndicator:
         mouse = self.mouse
         mouse_l = mouse.button(mouse.BUTTON_LEFT)
 
-        if mouse_l.down:
-            self._line_mouse.set_position(*mouse_l.down_position)
-
         if mouse_l.press:
             p = min(mouse_l.press_time, self._press_time) / self._press_time
 
             rn = p * self._radius
             self._circle_mouse.set_radius(rn)
-            self._circle_mouse.set_position(mouse.x, mouse.y)
-            self._circle_mouse.set_origin()
-
-            dx, dy = mouse_l.down_position
             self._circle_origin.set_radius(rn / 2)
-            self._circle_origin.set_position(dx, dy)
-            self._circle_origin.set_origin()
 
-            self._line_mouse.set_position_end(*mouse.position)
+            self._circle_mouse.set_position(*mouse.position)
+            self._circle_origin.set_position(*mouse_l.down_position)
+
+            ps, pe = self._circle_origin.position, self._circle_mouse.position
+            ps = point_math.move(*ps, self._circle_origin.radius, point_math.angle(*ps, *pe))
+            pe = point_math.move(*pe, self._circle_mouse.radius, point_math.angle(*pe, *ps))
+            self._line_mouse.set_position(*ps)
+            self._line_mouse.set_position_end(*pe)
 
     def draw(self):
         mouse = self.mouse

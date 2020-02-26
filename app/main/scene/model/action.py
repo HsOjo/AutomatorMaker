@@ -22,6 +22,7 @@ class ActionModel(BaseModel):
         end_x='End Position X',
         end_y='End Position Y',
         time='Operation Time',
+        count='Operation Count',
     )
     PARAMS_FIELD = dict(
         x=NumberField,
@@ -31,6 +32,7 @@ class ActionModel(BaseModel):
         end_x=NumberField,
         end_y=NumberField,
         time=NumberField,
+        count=NumberField,
     )
 
     def __init__(self, parent=None):

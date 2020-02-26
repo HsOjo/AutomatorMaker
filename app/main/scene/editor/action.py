@@ -2,6 +2,7 @@ from typing import List, Dict
 
 from PyQt5.QtGui import QColor
 
+from app.base.widget.graphics import Font
 from .base import BaseEditor
 from ..model import ActionModel, ObjectModel
 from ..object import ObjectRect, MouseIndicator
@@ -20,7 +21,9 @@ class ActionEditor(BaseEditor):
     DISTANCE_SWIPE = 8
     TIME_PRESS = 0.3
 
-    RADIUS_MOUSE_CIRCLE = 24
+    RADIUS_MOUSE_CIRCLE = 12
+    RADIUS_TAP_CIRCLE = 16
+    RADIUS_SWIPE_CIRCLE = 16
     TYPE_OPERATION = {
         ActionModel.TYPE_TAP: TapOperation,
         ActionModel.TYPE_PRESS: PressOperation,
@@ -31,7 +34,7 @@ class ActionEditor(BaseEditor):
     def __init__(self, event):
         super().__init__(event)
         self._event = event
-        self._operations = {}  # type: Dict[BaseOperation]
+        self._operations = {}  # type: Dict[BaseOperation, ActionModel]
         self._current_operation = None
         self._mouse_indicator = MouseIndicator(self._event, self.COLOR_ORIGIN, self.COLOR_MOUSE,
                                                self.RADIUS_MOUSE_CIRCLE, self.TIME_PRESS, self.DISTANCE_SWIPE)
@@ -41,6 +44,7 @@ class ActionEditor(BaseEditor):
         self._object_rect.set_color(self.COLOR_OBJECT)
 
         self._actions = None  # type: List[ActionModel]
+        self._creating = False
 
     def load_actions(self, object_: ObjectModel):
         actions = object_.actions
@@ -86,48 +90,76 @@ class ActionEditor(BaseEditor):
     def update(self):
         mouse = self.mouse
         mouse_l = mouse.button(mouse.BUTTON_LEFT)
-
         self._mouse_indicator.update()
 
-        if mouse_l.click_end:
-            cc = mouse_l.click_count_last
-            if cc > 1:
-                dx, dy = mouse_l.down_position
-                self.new_operation(ActionModel.TYPE_TAP, dict(
-                    x=dx, y=dy, count=cc
-                ))
-            elif cc > 0:
-                pt = mouse_l.press_time_last
-                cd = mouse_l.click_distance
-                dx, dy = mouse_l.down_position
-                rx, ry = mouse_l.release_position
-                if cd > self.DISTANCE_SWIPE:
-                    self.new_operation(ActionModel.TYPE_SWIPE, dict(
-                        start_x=dx, start_y=dy,
-                        end_x=rx, end_y=ry,
-                        time=mouse_l.press_time_last,
+        if self._creating:
+            if mouse_l.click_end:
+                cc = mouse_l.click_count_last
+                if cc > 1:
+                    dx, dy = mouse_l.down_position
+                    self.new_operation(ActionModel.TYPE_TAP, dict(
+                        x=dx, y=dy, count=cc
                     ))
-                else:
-                    if pt >= self.TIME_PRESS:
-                        self.new_operation(ActionModel.TYPE_PRESS, dict(
-                            x=dx, y=dy,
+                    self._creating = False
+                elif cc > 0:
+                    pt = mouse_l.press_time_last
+                    cd = mouse_l.click_distance
+                    dx, dy = mouse_l.down_position
+                    rx, ry = mouse_l.release_position
+                    if cd > self.DISTANCE_SWIPE:
+                        self.new_operation(ActionModel.TYPE_SWIPE, dict(
+                            start_x=dx, start_y=dy,
+                            end_x=rx, end_y=ry,
                             time=mouse_l.press_time_last,
                         ))
                     else:
-                        self.new_operation(ActionModel.TYPE_TAP, dict(
-                            x=dx, y=dy, count=cc
-                        ))
+                        if pt >= self.TIME_PRESS:
+                            self.new_operation(ActionModel.TYPE_PRESS, dict(
+                                x=dx, y=dy,
+                                time=mouse_l.press_time_last,
+                            ))
+                        else:
+                            self.new_operation(ActionModel.TYPE_TAP, dict(
+                                x=dx, y=dy, count=cc
+                            ))
+                    self._creating = False
+        else:
+            for operation in self._operations:
+                operation.update()
 
-    def new_operation(self, type, params: dict, sync=True):
-        operation_cls = self.TYPE_OPERATION.get(type)
+            if self._current_operation is not None:
+                if not self._current_operation.focus:
+                    self.set_current_operation(None)
+
+                if mouse_l.click_end and mouse_l.click_count_last == 2:
+                    self._event['set_params']()
+
+            if self._current_operation is None:
+                if mouse_l.down:
+                    for operation in reversed(self.operations):
+                        if operation.check_point(*mouse.position):
+                            self.set_current_operation(operation)
+                            break
+                    if self._current_operation is None:
+                        if self._object_rect.check_point(*mouse.position):
+                            self._creating = True
+                    else:
+                        self._current_operation.update()
+
+    def new_operation(self, type_, params: dict, sync=True):
+        operation_cls = self.TYPE_OPERATION.get(type_)
         operation = None
         if operation_cls is not None:
             operation = operation_cls(self._event)
             operation.load_params(**params)
+            operation.set_callback_modified(self.callback_operation_modified)
+            operation.set_focus_color(self.COLOR_FOCUS, self.COLOR_UNFOCUS)
             if isinstance(operation, TapOperation):
-                operation.circle.set_focus_color(self.COLOR_FOCUS, self.COLOR_UNFOCUS)
+                operation.circle.set_radius(self.RADIUS_TAP_CIRCLE)
             if isinstance(operation, SwipeOperation):
-                pass  # todo
+                operation.circle_start.set_radius(self.RADIUS_SWIPE_CIRCLE / 2)
+                operation.circle_end.set_radius(self.RADIUS_SWIPE_CIRCLE)
+
             if sync and self.add_item(operation):
                 self.set_current_operation(operation)
 
@@ -156,7 +188,8 @@ class ActionEditor(BaseEditor):
         self._object_rect.draw()
         for operation in self._operations:
             operation.draw()
-        self._mouse_indicator.draw()
+        if self._creating:
+            self._mouse_indicator.draw()
 
     def callback_operation_modified(self, operation_modified: BaseOperation):
         self.sync()
@@ -170,3 +203,17 @@ class ActionEditor(BaseEditor):
             action: ActionModel
             action.params = operation.params
         self.event['sync_actions'](self._actions)
+
+    def callback_item_edited(self, edited_item):
+        for operation, item in self._operations.items():
+            if edited_item == item:
+                operation.load_params(**item.params)
+                break
+
+    def callback_item_deleted(self, deleted_item):
+        for operation, item in self._operations.items():
+            if deleted_item == item:
+                self._operations.pop(operation)
+                if operation == self._current_operation:
+                    self.set_current_operation(None)
+                break

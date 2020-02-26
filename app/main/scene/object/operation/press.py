@@ -5,7 +5,7 @@ from ..advance_circle import AdvanceCircle
 class PressOperation(TapOperation):
     def __init__(self, event):
         super().__init__(event)
-        self._circle = AdvanceCircle(event)
+        self._font.set_text('Press')
         self._time = 1
 
     @property

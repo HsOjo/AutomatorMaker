@@ -4,17 +4,19 @@ from PyQt5.QtGui import QColor
 class BaseOperation:
     def __init__(self, event):
         self._event = event
-        self._focus = False
-        self._moving = False
         self._color_focus = QColor(255, 128, 0)
         self._color_unfocus = QColor(255, 255, 0)
-        self._callback_moving = None
+        self._callback_modified = None
 
     def update(self):
         pass
 
     def draw(self):
         pass
+
+    @property
+    def event(self):
+        return self._event
 
     @property
     def params(self) -> dict:
@@ -27,11 +29,11 @@ class BaseOperation:
 
     @property
     def moving(self):
-        return self._moving
+        return False
 
     @property
     def focus(self):
-        return self._focus
+        return False
 
     @property
     def color_focus(self):
@@ -42,13 +44,18 @@ class BaseOperation:
         return self._color_unfocus
 
     def set_focus_color(self, focus=None, unfocus=None):
-        if focus is not None:
-            self._color_focus = focus
-        if unfocus is not None:
-            self._color_unfocus = unfocus
+        pass
 
     def set_focus(self, b: bool):
-        self._focus = b
+        pass
 
-    def set_callback_moving(self, func):
-        self._callback_moving = func
+    def check_point(self, x, y):
+        return False
+
+    def set_callback_modified(self, func):
+        self._callback_modified = func
+
+    def _sub_callback_modified(self):
+        func = self._callback_modified
+        if func is not None:
+            func(self)

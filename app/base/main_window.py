@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow
 
-from app.base import BaseApplication
+from ..base import BaseApplication
 
 
 class BaseMainWindow(QMainWindow):

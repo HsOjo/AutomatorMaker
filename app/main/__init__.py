@@ -51,6 +51,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             select_feature=lambda i: self.select_item(self.TYPE_FEATURE, i),
             select_object=lambda i: self.select_item(self.TYPE_OBJECT, i),
             select_action=lambda i: self.select_item(self.TYPE_ACTION, i),
+            set_params=lambda: self._callback_set_item_params_triggered(True),
         )
 
         super().__init__(app)

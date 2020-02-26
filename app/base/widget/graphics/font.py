@@ -24,6 +24,10 @@ class Font(Node):
         self._border_mode = None
 
     @property
+    def font_size(self):
+        return self._font_size
+
+    @property
     def rect(self):
         return self._rect
 
@@ -35,6 +39,11 @@ class Font(Node):
     def draw_size(self):
         return self._rect.size
 
+    def set_font_size(self, size, px=False):
+        self._font_size = size
+        if px:
+            self._font_size = px_to_pt(px)
+
     def set_draw_size(self, w=None, h=None):
         self._cut = w is None and h is None
         if self._cut:
@@ -45,8 +54,8 @@ class Font(Node):
     def set_text(self, text: str):
         px = pt_to_px(self._font_size)
         self._text = text
-        self._w = max([count_text_size(line) * px for line in text.splitlines()])
-        self._h = px * (text.count('\n') + 1)
+        self._w = max([count_text_size(line) * px for line in text.splitlines()]) * 1.125
+        self._h = px * (text.count('\n') + 1) * 1.125
         if not self._cut:
             self._rect.set_size(*self.size)
 
