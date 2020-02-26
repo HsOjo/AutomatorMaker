@@ -1,14 +1,21 @@
-from .base import BaseOperation
+from .tap import TapOperation
 from ..advance_circle import AdvanceCircle
 
 
-class PressOperation(BaseOperation):
+class PressOperation(TapOperation):
     def __init__(self, event):
         super().__init__(event)
         self._circle = AdvanceCircle(event)
+        self._time = 1
 
-    def update(self):
-        self._circle.update()
+    @property
+    def params(self) -> dict:
+        params = super().params
+        params.update(
+            time=self._time
+        )
+        return params
 
-    def draw(self):
-        self._circle.draw()
+    def load_params(self, **params):
+        super().load_params(**params)
+        self._time = params.get('time', self._time)

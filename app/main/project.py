@@ -42,8 +42,9 @@ class Project:
     @try_exec(show=True, info_only=True)
     def save(self):
         data = dict((k, v.data) for k, v in self.scenes.items())
+        data_str = json.dumps(data, ensure_ascii=False)
         with self.save_file(self.FILENAME_INFO, encoding='utf-8') as io:
-            json.dump(data, io, ensure_ascii=False)
+            io.write(data_str)
 
     def get_path(self, filename, create_dir=False):
         path = '%s/%s' % (self._path, filename)

@@ -16,10 +16,15 @@ class MouseButton:
         self._press = False
         self._release = False
         self._click_count = 0
+        self._click_count_last = 0
         self._click_distance = 0
+        self._click_end = False
+        self._click_end_prev = False
         self._down_time = 0
         self._down_pos = None
         self._release_pos = None
+        self._release_time = 0
+        self._press_time = 0
 
     @property
     def _position(self):
@@ -42,8 +47,16 @@ class MouseButton:
         return self._click_count
 
     @property
+    def click_count_last(self):
+        return self._click_count_last
+
+    @property
     def click_distance(self):
         return self._click_distance
+
+    @property
+    def click_end(self):
+        return self._click_end and self._click_end_prev != self._click_end
 
     @property
     def down_position(self):
@@ -56,6 +69,10 @@ class MouseButton:
     @property
     def press_time(self):
         return time.time() - self._down_time
+
+    @property
+    def press_time_last(self):
+        return self._press_time
 
     @property
     def press_distance(self):
@@ -75,7 +92,9 @@ class MouseButton:
     @release.setter
     def release(self, b: bool):
         if b and self._release != b:
-            if time.time() - self._down_time < self.CLICK_INTERVAL:
+            self._release_time = time.time()
+            self._press_time = self._release_time - self._down_time
+            if self._release_time - self._down_time < self.CLICK_INTERVAL:
                 self._click_count += 1
             else:
                 self._click_count = 1
@@ -86,8 +105,13 @@ class MouseButton:
     def reset(self):
         self._down = False
         self._release = False
-        if time.time() - self._down_time > self.CLICK_INTERVAL:
+        now = time.time()
+        if now - self._down_time > self.CLICK_INTERVAL:
+            if self._click_count != 0:
+                self._click_count_last = self._click_count
             self._click_count = 0
+        self._click_end_prev = self._click_end
+        self._click_end = now - self._release_time > self.CLICK_INTERVAL
 
     def click(self, count=1):
         return self._click_count >= count and self._release

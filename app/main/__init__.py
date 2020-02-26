@@ -61,6 +61,11 @@ class MainWindow(BaseMainWindow, MainWindowView):
             self._project = Project.open('./test')
             self._device = list(PyADB('/Users/hsojo/Library/Android/sdk/platform-tools/adb').devices.values())[0]
             self.sync_scenes()
+            scene = list(self.project.scenes.values())[0]
+            self.sync_scene(scene)
+            self.scene_widget.set_scene(scene)
+            self.scene_widget.callback_select_object(0)
+            self.scene_widget.set_current_editor(self.scene_widget.EDIT_ACTION)
 
     @property
     def project(self):
@@ -208,8 +213,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
                 StringField('name', item.name, title=self.tr('Name')),
                 SelectField('type', options=item.ALL_TYPES, value=item.type, title=self.tr('Type')),
                 SelectField(
-                    'dest_scene', options=[scene.name for scene in self.project.scenes],
-                    value=item.dest_scene, title=self.tr('Type')
+                    'dest_scene', options=['None'] + [scene for scene in self.project.scenes],
+                    value=item.dest_scene, title=self.tr('Scene')
                 ),
             ], self.tr('Edit Action'))
             if data is not None:
@@ -232,6 +237,14 @@ class MainWindow(BaseMainWindow, MainWindowView):
             self.sync_objects(items)
         elif tab_index == self.TAB_ACTIONS:
             self.sync_actions(items)
+
+    def _callback_set_item_params_triggered(self, b: bool):
+        item = self.current_item
+        if isinstance(item, ActionModel):
+            fields = []
+            for k, v in item.params.items():
+                fields.append(item.PARAMS_FIELD[k](k, v, item.PARAMS_TITLE.get(k)))
+            FormDialog.input(fields, self.tr('Set Action Parameters'))
 
     def _callback_scene_changed(self, current: str, previous: str):
         # Reset tab, if in actions.

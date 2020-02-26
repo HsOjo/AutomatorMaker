@@ -147,12 +147,16 @@ class GraphicsWidget(QWidget):
         self.callback_resize(size.width(), size.height())
 
     def showEvent(self, *args):
-        super().showEvent(*args)
         self.set_pause(False)
+        super().showEvent(*args)
 
     def hideEvent(self, *args):
-        super().hideEvent(*args)
         self.set_pause(True)
+        super().hideEvent(*args)
+
+    def closeEvent(self, *args):
+        self.set_pause(True)
+        super().closeEvent(*args)
 
     @_ignore_on_pause
     def mouseMoveEvent(self, me: QMouseEvent):
