@@ -290,4 +290,4 @@ class Ui_MainWindow(object):
         self.actionSetItemParams.setText(_translate("MainWindow", "Set Item Parameters"))
         self.actionSetItemParams.setShortcut(_translate("MainWindow", "Ctrl+E"))
         self.actionRemoveScene.setText(_translate("MainWindow", "Remove Scene"))
-        self.actionRemoveScene.setShortcut(_translate("MainWindow", "Ctrl+W"))
+        self.actionRemoveScene.setShortcut(_translate("MainWindow", "Ctrl+Backspace"))

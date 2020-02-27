@@ -489,7 +489,7 @@
     <string>Remove Scene</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+W</string>
+    <string>Ctrl+Backspace</string>
    </property>
   </action>
  </widget>
