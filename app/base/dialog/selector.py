@@ -7,7 +7,7 @@ from ..view import BaseView
 
 
 class SelectorView(Ui_SelectDialog, BaseView):
-    def register_callback(self):
+    def callback_event_register(self):
         self.buttonBox.accepted.connect(self._callback_accepted)
         self.buttonBox.rejected.connect(self._callback_rejected)
 

@@ -229,7 +229,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "AutomatorMaker"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "DTAutomatorMaker"))
         item = self.tableWidgetFeatures.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "index"))
         item = self.tableWidgetFeatures.horizontalHeaderItem(1)

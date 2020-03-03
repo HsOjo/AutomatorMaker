@@ -1,1 +1,3 @@
-# AutomatorMaker
+# DTAutomatorMaker
+
+Droid Test Automator Maker.

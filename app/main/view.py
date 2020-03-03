@@ -14,7 +14,7 @@ class MainWindowView(Ui_MainWindow, BaseView):
     TAB_OBJECTS = 1
     TAB_ACTIONS = 2
 
-    def _callback_init(self):
+    def callback_init(self):
         self._scene_tab_event = False
         self._scene_tab_prev_index = self.tabWidgetScene.currentIndex()
         self.scene_widget = SceneWidget(self.scrollAreaWidgetContents)
@@ -22,7 +22,7 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.gridLayout_Preview.addWidget(self.scene_widget, 0, 0, 1, 1)
         self.tableWidgetScenes.setCurrentCell(-1, -1)
 
-    def register_callback(self):
+    def callback_event_register(self):
         self.actionCaptureScene.triggered.connect(self._callback_capture_scene_triggered)
         self.actionOpen.triggered.connect(self._callback_open_triggered)
         self.actionSave.triggered.connect(self._callback_save_triggered)

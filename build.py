@@ -1,7 +1,7 @@
 import os
 import shutil
 
-APP_NAME = 'AutomatorMaker'
+APP_NAME = 'DTAutomatorMaker'
 datas = {}
 
 

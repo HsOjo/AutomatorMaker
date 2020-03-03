@@ -1,13 +1,13 @@
 class BaseView:
     def __init__(self):
         self.setupUi(self)
-        self._callback_init()
-        self.register_callback()
+        self.callback_init()
+        self.callback_event_register()
 
-    def _callback_init(self):
+    def callback_init(self):
         pass
 
-    def register_callback(self):
+    def callback_event_register(self):
         pass
 
     def setupUi(self, widget):
