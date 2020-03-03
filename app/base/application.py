@@ -19,9 +19,9 @@ class BaseApplication(QApplication):
         QMessageBox.warning(self.main_window, 'Error', exc)
 
     def hook_exception(self):
-        def boom(*_):
+        def boom(type_, value, tb):
             import traceback
-            exc = traceback.format_exc()
+            exc = ''.join(traceback.format_exception(type_, value, tb))
             self.callback_catch(exc)
 
         sys.excepthook = boom
