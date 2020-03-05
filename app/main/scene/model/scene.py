@@ -23,7 +23,7 @@ class SceneModel(BaseModel):
     def img_path(self):
         return self._event['get_path'](self.img)
 
-    def rename(self, old, new):
+    def rename(self, new):
         img_name = self.img
         self.name = new
         self.img = '%s.png' % new

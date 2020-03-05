@@ -50,4 +50,5 @@ class BaseModel:
                     v = items
                 else:
                     raise Exception('Unsupport Type.')
-            setattr(self, k, v)
+            if hasattr(self, k):
+                setattr(self, k, v)

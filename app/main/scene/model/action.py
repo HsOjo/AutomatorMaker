@@ -14,6 +14,8 @@ class ActionModel(BaseModel):
     }
     ALL_TYPES_REV = dict((v, k) for k, v in ALL_TYPES.items())
 
+    SCENE_NONE = 'None'
+
     PARAMS_TITLE = dict(
         x='Position X',
         y='Position Y',
@@ -38,6 +40,6 @@ class ActionModel(BaseModel):
     def __init__(self, parent=None):
         self.name = ''
         self.type = self.TYPE_TAP
-        self.dest_scene = 'None'
+        self.dest_scene = self.SCENE_NONE
         self.params = {}
         self._parent = parent
