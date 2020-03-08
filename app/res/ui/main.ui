@@ -90,6 +90,11 @@
           </column>
           <column>
            <property name="text">
+            <string>mode</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
             <string>rect</string>
            </property>
           </column>

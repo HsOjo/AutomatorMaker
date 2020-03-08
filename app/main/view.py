@@ -2,10 +2,7 @@ from PyQt5.QtWidgets import QSizePolicy
 
 from app.base import BaseView
 from app.res.ui.main import Ui_MainWindow
-from . import ActionModel
 from .scene import SceneWidget
-from ..base.dialog.form import FormDialog
-from ..base.dialog.form.field import NumberField, StringField
 from ..base.helper import TableHelper
 
 
@@ -88,12 +85,17 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.scene_widget.callback_select_action(current)
 
     def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
+        current_table = None
         if current == self.TAB_ACTIONS:
-            TableHelper.auto_inject_columns_width(self.tableWidgetActions)
+            current_table = self.tableWidgetActions
         elif current == self.TAB_OBJECTS:
-            TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
+            current_table = self.tableWidgetObjects
         elif current == self.TAB_FEATURES:
-            TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
+            current_table = self.tableWidgetFeatures
+        if current_table is not None:
+            TableHelper.auto_inject_columns_width(current_table)
+            current_table.setCurrentCell(-1, -1)
+
         return True
 
     def __callback_scene_tab_changed(self, index):

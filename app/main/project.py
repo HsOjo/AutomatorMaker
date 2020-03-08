@@ -16,7 +16,7 @@ class Project:
             get_path=self.get_path,
             move_file=self.move_file,
         )
-        self.scenes = {}  # type: Dict[SceneModel]
+        self.scenes = {}  # type: Dict[str, SceneModel]
 
     @staticmethod
     def open(path):
@@ -67,8 +67,13 @@ class Project:
         if new in self.scenes:
             raise Exception('Already exist scene "%s"!' % new)
         scene = self.scenes.pop(old)  # type: SceneModel
-        scene.rename(old, new)
+        scene.rename(new)
         self.scenes[new] = scene
+        for scene in self.scenes.values():
+            for object_ in scene.objects:
+                for action in object_.actions:
+                    if action.dest_scene == old:
+                        action.dest_scene = new
 
     def add_scene(self, img_data: bytes, name=None):
         if name is None:

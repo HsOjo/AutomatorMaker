@@ -110,7 +110,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         data = []
         for i, v in enumerate(features):
             v: FeatureModel
-            data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.detect_weight])
+            data.append([i, v.name, v.ALL_MODES_REV.get(v.mode), '%s,%s,%s,%s' % tuple(v.rect), v.detect_weight])
         TableHelper.sync_data(self.tableWidgetFeatures, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
         self.sync_scenes()
@@ -160,7 +160,14 @@ class MainWindow(BaseMainWindow, MainWindowView):
 
         img_data = self._device.display.screen_cap()
         text, b = QInputDialog.getText(self, self.tr('Capture New Scene'), self.tr('Please input scene name.'))
-        self._project.add_scene(img_data, text if b and text != '' else None)
+        if text not in self._project.scenes:
+            self._project.add_scene(img_data, text if b and text != '' else None)
+        else:
+            scene = self._project.scenes[text]
+            with open(scene.img_path, 'wb') as io:
+                io.write(img_data)
+            if self.scene_widget.scene == scene:
+                self.scene_widget.set_scene(scene)
         self.sync_scenes()
 
     def _callback_select_device_triggered(self, b: bool):
@@ -206,6 +213,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         if isinstance(item, FeatureModel):
             data = FormDialog.input([
                 StringField('name', item.name, title=self.tr('Name')),
+                SelectField('mode', options=item.ALL_MODES, value=item.mode, title=self.tr('Mode')),
                 RectField('rect', item.rect, title=self.tr('Rect')),
                 RangeField(
                     'detect_weight', item.detect_weight,
@@ -276,6 +284,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
     def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
         super()._callback_scene_tab_changed(current, previous)
         b = self.scene_widget.set_current_editor(current)
+        self.scene_widget.current_editor.select(-1)
         if not b:
             QMessageBox.warning(self, self.tr('Error'), self.tr('Please select "Object Item" first!'))
         return b

@@ -30,6 +30,8 @@ class RectEditor(BaseEditor):
         rects = self.rects
         if 0 <= index < len(rects):
             self.set_current_rect(rects[index], sync=False)
+        else:
+            self.set_current_rect(None, sync=False)
 
     def set_current_rect(self, rect, sync=True):
         # sync param use by overwrite function.

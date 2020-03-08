@@ -74,6 +74,8 @@ class ActionEditor(BaseEditor):
         operations = self.operations
         if 0 <= index < len(operations):
             self.set_current_operation(operations[index], sync=False)
+        else:
+            self.set_current_operation(None, sync=False)
 
     @property
     def current_action(self):
