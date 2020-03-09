@@ -1,3 +1,4 @@
 DTAutomator
 PyOjo
 OjoPyADB
+PyQt5
