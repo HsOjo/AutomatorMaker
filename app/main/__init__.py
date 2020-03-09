@@ -267,7 +267,8 @@ class MainWindow(BaseMainWindow, MainWindowView):
         item = self.current_item
         if isinstance(item, ActionModel):
             fields = []
-            for k, v in item.params.items():
+            for k in ActionModel.PARAMS_TYPE[item.type] + ActionModel.PARAMS_COMMON:
+                v = item.params.get(k, ActionModel.PARAMS_DEFAULT.get(k))
                 fields.append(item.PARAMS_FIELD[k](k, v, item.PARAMS_TITLE.get(k)))
             FormDialog.input(fields, self.tr('Set Action Parameters'))
 

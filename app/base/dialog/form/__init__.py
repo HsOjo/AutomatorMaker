@@ -37,7 +37,7 @@ class FormDialog(QDialog, FormView):
             self.setWindowTitle(title)
         ms = self.minimumSize()
         ms.setWidth(max(ms.width(), 320))
-        ms.setHeight(max(ms.height(), len(fields) * 32, 240))
+        ms.setHeight(max(ms.height(), len(fields) * 48, 240))
         self.setMinimumSize(ms)
         self.resize(ms)
 

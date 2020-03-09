@@ -1,20 +1,16 @@
+from dt_automator.maker.model import MakerActionModel
+
 from app.base.dialog.form.field import NumberField
-from app.base.model import BaseModel
 
 
-class ActionModel(BaseModel):
-    TYPE_TAP = 0
-    TYPE_SWIPE = 1
-    TYPE_PRESS = 2
+class ActionModel(MakerActionModel):
+    PARAMS_COMMON = ['distance', 'wait']
 
-    ALL_TYPES = {
-        'Tap': TYPE_TAP,
-        'Swipe': TYPE_SWIPE,
-        'Press': TYPE_PRESS,
+    PARAMS_TYPE = {
+        MakerActionModel.TYPE_TAP: ['x', 'y', 'count'],
+        MakerActionModel.TYPE_PRESS: ['x', 'y', 'time'],
+        MakerActionModel.TYPE_SWIPE: ['start_x', 'start_y', 'end_x', 'end_y', 'time'],
     }
-    ALL_TYPES_REV = dict((v, k) for k, v in ALL_TYPES.items())
-
-    SCENE_NONE = 'None'
 
     PARAMS_TITLE = dict(
         x='Position X',
@@ -25,7 +21,10 @@ class ActionModel(BaseModel):
         end_y='End Position Y',
         time='Operation Time',
         count='Operation Count',
+        distance='Operation Distance',
+        wait='Operation Wait Time (After)',
     )
+
     PARAMS_FIELD = dict(
         x=NumberField,
         y=NumberField,
@@ -35,11 +34,19 @@ class ActionModel(BaseModel):
         end_y=NumberField,
         time=NumberField,
         count=NumberField,
+        distance=NumberField,
+        wait=NumberField,
     )
 
-    def __init__(self, parent=None):
-        self.name = ''
-        self.type = self.TYPE_TAP
-        self.dest_scene = self.SCENE_NONE
-        self.params = {}
-        self._parent = parent
+    PARAMS_DEFAULT = dict(
+        x=0,
+        y=0,
+        start_x=0,
+        start_y=0,
+        end_x=0,
+        end_y=0,
+        time=1,
+        count=1,
+        distance=1,
+        wait=1,
+    )
