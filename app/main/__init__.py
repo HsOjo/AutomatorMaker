@@ -9,6 +9,7 @@ from pyojo.tools.shell import get_app_shell
 from app.base import BaseMainWindow
 from app.base.dialog import SelectDialog
 from .project import Project
+from .scene import ActionEditor
 from .scene.model import SceneModel, FeatureModel, ObjectModel, ActionModel
 from .view import MainWindowView
 from .. import BaseApplication
@@ -266,11 +267,20 @@ class MainWindow(BaseMainWindow, MainWindowView):
     def _callback_set_item_params_triggered(self, b: bool):
         item = self.current_item
         if isinstance(item, ActionModel):
+            ce = self.scene_widget.current_editor
+            if isinstance(ce, ActionEditor):
+                params = ce.current_operation.params
+            else:
+                params = None
             fields = []
             for k in ActionModel.PARAMS_TYPE[item.type] + ActionModel.PARAMS_COMMON:
-                v = item.params.get(k, ActionModel.PARAMS_DEFAULT.get(k))
+                v = params.get(k, ActionModel.PARAMS_DEFAULT.get(k))
                 fields.append(item.PARAMS_FIELD[k](k, v, item.PARAMS_TITLE.get(k)))
-            FormDialog.input(fields, self.tr('Set Action Parameters'))
+            params = FormDialog.input(fields, self.tr('Set Action Parameters'))
+            if params is not None:
+                item.params = params
+                self.scene_widget.callback_item_edited(self.current_item)
+                self.sync_actions(self.current_items)
 
     def _callback_scene_changed(self, current: str, previous: str):
         # Reset tab, if in actions.

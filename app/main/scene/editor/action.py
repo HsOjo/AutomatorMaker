@@ -6,7 +6,7 @@ from app.utils import list_math
 from .base import BaseEditor
 from ..model import ActionModel, ObjectModel
 from ..object import ObjectRect, MouseIndicator
-from ..object.operation import BaseOperation, TapOperation, PressOperation, SwipeOperation
+from ..object.operation import BaseOperation, TapOperation, SwipeOperation
 
 
 class ActionEditor(BaseEditor):
@@ -26,7 +26,6 @@ class ActionEditor(BaseEditor):
     RADIUS_SWIPE_CIRCLE = 16
     TYPE_OPERATION = {
         ActionModel.TYPE_TAP: TapOperation,
-        ActionModel.TYPE_PRESS: PressOperation,
         ActionModel.TYPE_SWIPE: SwipeOperation,
     }
     TYPE_OPERATION_REV = dict((v, k) for k, v in TYPE_OPERATION.items())
@@ -78,6 +77,10 @@ class ActionEditor(BaseEditor):
             self.set_current_operation(None, sync=False)
 
     @property
+    def current_operation(self):
+        return self._current_operation
+
+    @property
     def current_action(self):
         return self._operations.get(self._current_operation)
 
@@ -100,11 +103,12 @@ class ActionEditor(BaseEditor):
         if self._creating:
             if mouse_l.click_end:
                 cc = mouse_l.click_count_last
+                press_time = int(mouse_l.press_time_last * 1000)
                 if cc > 1:
                     dx, dy = mouse_l.down_position
                     dx, dy = list_math.reduce([dx, dy], self._object_origin)
                     self.new_operation(ActionModel.TYPE_TAP, dict(
-                        x=dx, y=dy, count=cc
+                        x=dx, y=dy, count=cc, press_time=press_time
                     ))
                     self._creating = False
                 elif cc > 0:
@@ -118,17 +122,17 @@ class ActionEditor(BaseEditor):
                         self.new_operation(ActionModel.TYPE_SWIPE, dict(
                             start_x=dx, start_y=dy,
                             end_x=rx, end_y=ry,
-                            time=mouse_l.press_time_last,
+                            time=press_time,
                         ))
                     else:
                         if pt >= self.TIME_PRESS:
-                            self.new_operation(ActionModel.TYPE_PRESS, dict(
+                            self.new_operation(ActionModel.TYPE_TAP, dict(
                                 x=dx, y=dy,
-                                time=mouse_l.press_time_last,
+                                press_time=press_time,
                             ))
                         else:
                             self.new_operation(ActionModel.TYPE_TAP, dict(
-                                x=dx, y=dy, count=cc
+                                x=dx, y=dy, count=cc, press_time=press_time
                             ))
                     self._creating = False
         else:

@@ -51,14 +51,16 @@ class SwipeOperation(BaseOperation):
 
     @property
     def params(self) -> dict:
+        params = self._params.copy()
         ox, oy = self._origin.x(), self._origin.y()
-        return dict(
+        params.update(dict(
             start_x=self._circle_start.x - ox,
             start_y=self._circle_start.y - oy,
             end_x=self._circle_end.x - ox,
             end_y=self._circle_end.y - oy,
             time=self._time,
-        )
+        ))
+        return params
 
     def load_params(self, origin, **params):
         super().load_params(origin, **params)

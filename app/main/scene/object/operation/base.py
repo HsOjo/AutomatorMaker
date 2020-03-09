@@ -9,6 +9,7 @@ class BaseOperation:
         self._color_focus = QColor(255, 128, 0)
         self._color_unfocus = QColor(255, 255, 0)
         self._callback_moving = None
+        self._params = {}
 
     def update(self):
         pass
@@ -22,9 +23,10 @@ class BaseOperation:
 
     @property
     def params(self) -> dict:
-        return {}
+        return self._params
 
     def load_params(self, origin, **params):
+        self._params = params
         x, y = origin
         self._origin.setX(x)
         self._origin.setY(y)
