@@ -16,6 +16,6 @@ class NumberField(StringField):
         else:
             v = value
             v = v[1:] if v[0] == '-' else v
-            v = ''.join(v.split('.')) if v.count('.') == 1 else v
+            v = v.replace('.', '', 1) if v.count('.') == 1 else v
             value = float(value) if v.isdigit() else 0
         return value
