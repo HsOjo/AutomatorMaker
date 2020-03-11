@@ -58,7 +58,6 @@ class Key:
 
     @down.setter
     def down(self, b: bool):
-        print(self.name)
         if b and self._down != b:
             self._down_time = time.time()
         self._down = b
