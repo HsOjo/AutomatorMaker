@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import time
 from typing import Dict
 
 from app.base.common import try_exec
@@ -8,6 +9,7 @@ from app.main.scene.model import SceneModel
 
 
 class Project:
+    BACKUP_DIR = 'backups'
     FILENAME_INFO = 'info.json'
 
     def __init__(self):
@@ -43,6 +45,7 @@ class Project:
     def save(self):
         data = dict((k, v.data) for k, v in self.scenes.items())
         data_str = json.dumps(data, ensure_ascii=False)
+        self.move_file(self.FILENAME_INFO, '%s/%s' % (self.BACKUP_DIR, '%s' % time.strftime('%Y-%m-%d_%H-%M-%S.json')))
         with self.save_file(self.FILENAME_INFO, encoding='utf-8') as io:
             io.write(data_str)
 
