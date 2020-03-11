@@ -9,7 +9,7 @@ from pyojo.tools.shell import get_app_shell
 from app.base import BaseMainWindow
 from app.base.dialog import SelectDialog
 from .project import Project
-from .scene import ActionEditor
+from .scene import ActionEditor, ObjectEditor
 from .scene.model import SceneModel, FeatureModel, ObjectModel, ActionModel
 from .view import MainWindowView
 from .. import BaseApplication
@@ -58,6 +58,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
             select_object=lambda i: self.select_item(self.TYPE_OBJECT, i),
             select_action=lambda i: self.select_item(self.TYPE_ACTION, i),
             set_params=lambda: self._callback_set_item_params_triggered(True),
+            show_status=self.show_status,
         )
 
         super().__init__(app)
@@ -111,7 +112,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         data = []
         for i, v in enumerate(features):
             v: FeatureModel
-            data.append([i, v.name, v.ALL_MODES_REV.get(v.mode), '%s,%s,%s,%s' % tuple(v.rect), v.detect_weight])
+            data.append([i, v.name, v.ALL_MODES_REV.get(v.mode), v.rect, v.detect_weight])
         TableHelper.sync_data(self.tableWidgetFeatures, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetFeatures)
         self.sync_scenes()
@@ -121,7 +122,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
         data = []
         for i, v in enumerate(objects):
             v: ObjectModel
-            data.append([i, v.name, '%s,%s,%s,%s' % tuple(v.rect), v.ALL_TYPES_REV.get(v.type), len(v.actions)])
+            data.append([i, v.name, v.rect, v.ALL_TYPES_REV.get(v.type), len(v.actions), v.params])
         TableHelper.sync_data(self.tableWidgetObjects, data)
         TableHelper.auto_inject_columns_width(self.tableWidgetObjects)
         self.sync_scenes()
@@ -239,7 +240,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
                 StringField('name', item.name, title=self.tr('Name')),
                 SelectField('type', options=item.ALL_TYPES, value=item.type, title=self.tr('Type')),
                 SelectField(
-                    'dest_scene', options=['None'] + [scene for scene in self.project.scenes],
+                    'dest_scene', options=[item.PARAM_NONE] + [scene for scene in self.project.scenes],
                     value=item.dest_scene, title=self.tr('Scene')
                 ),
             ], self.tr('Edit Action'))
@@ -265,22 +266,26 @@ class MainWindow(BaseMainWindow, MainWindowView):
             self.sync_actions(items)
 
     def _callback_set_item_params_triggered(self, b: bool):
-        item = self.current_item
-        if isinstance(item, ActionModel):
-            ce = self.scene_widget.current_editor
-            if isinstance(ce, ActionEditor):
-                params = ce.current_operation.params
-            else:
-                params = None
-            fields = []
-            for k in ActionModel.PARAMS_TYPE[item.type] + ActionModel.PARAMS_COMMON:
-                v = params.get(k, ActionModel.PARAMS_DEFAULT.get(k))
-                fields.append(item.PARAMS_FIELD[k](k, v, item.PARAMS_TITLE.get(k)))
-            params = FormDialog.input(fields, self.tr('Set Action Parameters'))
-            if params is not None:
-                item.params = params
-                self.scene_widget.callback_item_edited(self.current_item)
-                self.sync_actions(self.current_items)
+        ce = self.scene_widget.current_editor
+        item = None
+        if isinstance(ce, ActionEditor):
+            item = ce.current_action
+        elif isinstance(ce, ObjectEditor):
+            item = ce.current_object
+
+        if item is not None:
+            params_field = item.PARAMS_TYPE[item.type] + item.PARAMS_COMMON
+            if len(params_field) > 0:
+                params = item.params
+                fields = []
+                for k in params_field:
+                    v = params.get(k, item.PARAMS_DEFAULT.get(k))
+                    fields.append(item.PARAMS_FIELD[k](k, v, item.PARAMS_TITLE.get(k)))
+                params = FormDialog.input(fields, self.tr('Set Action Parameters'))
+                if params is not None:
+                    item.params = params
+                    self.scene_widget.callback_item_edited(self.current_item)
+                    self.sync_objects(self.current_items)
 
     def _callback_scene_changed(self, current: str, previous: str):
         # Reset tab, if in actions.
@@ -301,3 +306,9 @@ class MainWindow(BaseMainWindow, MainWindowView):
     def showEvent(self, *args):
         super().showEvent(*args)
         TableHelper.auto_inject_columns_width(self.tableWidgetScenes)
+
+    def resizeEvent(self, *args):
+        super().resizeEvent(*args)
+        current_table = self.current_table_widget
+        if current_table is not None:
+            TableHelper.auto_inject_columns_width(current_table)

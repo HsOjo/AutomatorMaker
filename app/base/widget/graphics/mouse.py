@@ -10,8 +10,8 @@ class MouseButton:
     CLICK_INTERVAL = 0.18
 
     def __init__(self, name, event: dict):
-        self._event = event
         self._name = name
+        self._event = event
         self._down = False
         self._press = False
         self._release = False
@@ -25,6 +25,10 @@ class MouseButton:
         self._release_pos = None
         self._release_time = 0
         self._press_time = 0
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def _position(self):
@@ -134,7 +138,6 @@ class Mouse:
         Qt.MidButton | Qt.RightButton: [BUTTON_MID, BUTTON_RIGHT],
         Qt.LeftButton | Qt.MidButton | Qt.RightButton: [BUTTON_LEFT, BUTTON_MID, BUTTON_RIGHT],
     }
-    ALL_BUTTONS = [BUTTON_LEFT, BUTTON_RIGHT, BUTTON_MID]
 
     def __init__(self, event: dict):
         self._position = QPoint(0, 0)
@@ -142,7 +145,12 @@ class Mouse:
         self._event.update(
             position=lambda: self.position
         )
-        self._buttons = dict((b, MouseButton(b, self._event)) for b in self.ALL_BUTTONS)
+
+        self.buttons_all = {}
+        for k in dir(self):
+            if k[0:7] == 'BUTTON_':
+                self.buttons_all[k] = getattr(self, k)
+        self._buttons = dict((v, MouseButton(k, self._event)) for k, v in self.buttons_all.items())
 
     @property
     def debug(self):
@@ -161,7 +169,7 @@ class Mouse:
                     btn.down = True
                     btn.press = True
         elif status == self.STAT_RELEASE or btns is None:
-            btns = [btn for btn in self.ALL_BUTTONS if btn not in btns] if btns is not None else self.ALL_BUTTONS
+            btns = [btn for btn in self.buttons_all.values() if btn not in btns] if btns is not None else self.buttons_all.values()
             for k in btns:
                 btn = self._buttons[k]
                 if btn.press:
@@ -169,8 +177,7 @@ class Mouse:
                     btn.release = True
 
     def reset(self):
-        for k in self.ALL_BUTTONS:
-            btn = self._buttons[k]
+        for btn in self._buttons.values():
             btn.reset()
 
     @property
@@ -186,8 +193,8 @@ class Mouse:
 
     @property
     def x(self):
-        return self._position.x() / self.scale
+        return int(self._position.x() / self.scale)
 
     @property
     def y(self):
-        return self._position.y() / self.scale
+        return int(self._position.y() / self.scale)

@@ -1,12 +1,13 @@
 import time
 
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtGui import QPainter, QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QPainter, QMouseEvent, QResizeEvent, QKeyEvent
 from PyQt5.QtWidgets import QWidget
 
 from .circle import Circle
 from .factory import Factory
 from .font import Font
+from .keyboard import Keyboard
 from .line import Line
 from .mouse import Mouse
 from .node import Node
@@ -55,6 +56,7 @@ class GraphicsWidget(QWidget):
         self.set_refresh_rate(refresh_rate)
 
         self._mouse = Mouse(self._event)
+        self._keyboard = Keyboard(self._event)
         self.new = Factory(self._event)
 
     @property
@@ -105,6 +107,10 @@ class GraphicsWidget(QWidget):
         return self._mouse
 
     @property
+    def keyboard(self):
+        return self._keyboard
+
+    @property
     def scale(self):
         return self._scale
 
@@ -135,6 +141,7 @@ class GraphicsWidget(QWidget):
             self._fps = self._frame_count - self._frame_count_p
             self._frame_count_p = self._frame_count
         self._mouse.reset()
+        self._keyboard.reset()
 
         pe = self._event.get('process_events')
         if pe is not None:
@@ -170,8 +177,18 @@ class GraphicsWidget(QWidget):
 
     @_ignore_on_pause
     def mouseReleaseEvent(self, me: QMouseEvent):
-        super().mousePressEvent(me)
+        super().mouseReleaseEvent(me)
         self._mouse.update(me, status=Mouse.STAT_RELEASE)
+
+    @_ignore_on_pause
+    def keyPressEvent(self, ke: QKeyEvent) -> None:
+        super().keyPressEvent(ke)
+        self._keyboard.update(ke, status=Keyboard.STAT_PRESS)
+
+    @_ignore_on_pause
+    def keyReleaseEvent(self, ke: QKeyEvent) -> None:
+        super().keyReleaseEvent(ke)
+        self._keyboard.update(ke, status=Keyboard.STAT_RELEASE)
 
     @_ignore_on_pause
     def focusInEvent(self, *args):

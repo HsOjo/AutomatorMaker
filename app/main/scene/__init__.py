@@ -1,8 +1,9 @@
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QImage
 
 from app.base.widget import GraphicsWidget
 from app.main.scene.editor import FeatureEditor, ObjectEditor, ActionEditor, BaseEditor
 from app.main.scene.model import SceneModel, ObjectModel, FeatureModel, ActionModel
+from app.main.scene.object import ColorPicker
 
 
 class SceneWidget(GraphicsWidget):
@@ -15,14 +16,14 @@ class SceneWidget(GraphicsWidget):
         self.set_antialiasing(True)
 
         self.screen = self.new.sprite()
-        self.rect_base = self.new.rect()
-        self.rect_base.set_color(QColor(255, 0, 0))
+        self._screen_image = None  # type: QImage
 
+        self._color_picker = ColorPicker(self.event_)
         self._scene = None  # type: SceneModel
 
-        self._feature_editor = FeatureEditor(self._event)
-        self._object_editor = ObjectEditor(self._event)
-        self._action_editor = ActionEditor(self._event)
+        self._feature_editor = FeatureEditor(self.event_)
+        self._object_editor = ObjectEditor(self.event_)
+        self._action_editor = ActionEditor(self.event_)
 
         self._editors = {
             self.EDIT_FEATURE: self._feature_editor,
@@ -30,6 +31,11 @@ class SceneWidget(GraphicsWidget):
             self.EDIT_ACTION: self._action_editor,
         }
         self._currnet_editor = self.EDIT_FEATURE
+
+        self.event_.update(
+            screen_image=lambda: self._screen_image,
+            color_pick_current=lambda: self._color_picker.color,
+        )
 
     @property
     def current_editor(self) -> BaseEditor:
@@ -45,10 +51,12 @@ class SceneWidget(GraphicsWidget):
 
     def callback_update(self):
         self.current_editor.update()
+        self._color_picker.update()
 
     def callback_draw(self):
         self.screen.draw()
         self.current_editor.draw()
+        self._color_picker.draw()
 
     def callback_resize(self, w, h):
         self.inject_size()
@@ -62,6 +70,9 @@ class SceneWidget(GraphicsWidget):
         with open(scene.img_path, 'rb') as io:
             img_data = io.read()
         self.screen.set_image(img_data)
+
+        self._screen_image = self.screen.pixmap.toImage()
+
         self._feature_editor.load_features(scene.features)
         self._object_editor.load_objects(scene.objects)
         self.inject_size()

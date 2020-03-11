@@ -172,6 +172,11 @@
             <string>actions</string>
            </property>
           </column>
+          <column>
+           <property name="text">
+            <string>params</string>
+           </property>
+          </column>
          </widget>
         </item>
        </layout>
@@ -273,6 +278,9 @@
        </property>
        <item row="0" column="0">
         <widget class="QScrollArea" name="scrollArea">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>

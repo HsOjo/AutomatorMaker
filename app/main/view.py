@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QSizePolicy
+from PyQt5.QtWidgets import QSizePolicy, QLabel
 
 from app.base import BaseView
 from app.res.ui.main import Ui_MainWindow
@@ -18,6 +18,13 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.scene_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.gridLayout_Preview.addWidget(self.scene_widget, 0, 0, 1, 1)
         self.tableWidgetScenes.setCurrentCell(-1, -1)
+        self.labelStatus = QLabel()
+        self.statusbar.addPermanentWidget(self.labelStatus, 1)
+
+    def show_status(self, status):
+        if status != self.labelStatus.text():
+            self.labelStatus.setText(status)
+            self.labelStatus.repaint()
 
     def callback_event_register(self):
         self.actionCaptureScene.triggered.connect(self._callback_capture_scene_triggered)
@@ -85,13 +92,7 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.scene_widget.callback_select_action(current)
 
     def _callback_scene_tab_changed(self, current: int, previous: int) -> bool:
-        current_table = None
-        if current == self.TAB_ACTIONS:
-            current_table = self.tableWidgetActions
-        elif current == self.TAB_OBJECTS:
-            current_table = self.tableWidgetObjects
-        elif current == self.TAB_FEATURES:
-            current_table = self.tableWidgetFeatures
+        current_table = self.current_table_widget
         if current_table is not None:
             TableHelper.auto_inject_columns_width(current_table)
             current_table.setCurrentCell(-1, -1)
