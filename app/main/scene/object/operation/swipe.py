@@ -1,5 +1,6 @@
-from app.base.utils import point_math
-from app.base.widget.graphics import Line, Font
+from ojoqt.utils import point_math
+from ojoqt.widget.graphics import Line, Font
+
 from app.utils import list_math
 from .base import BaseOperation
 from ..advance_circle import AdvanceCircle

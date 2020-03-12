@@ -2,7 +2,6 @@ from typing import Dict
 
 from PyQt5.QtGui import QColor
 
-from app.base.widget.graphics import Rect
 from .base import BaseEditor
 from ..object import AdvanceRect
 

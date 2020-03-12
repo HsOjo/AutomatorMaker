@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
 class Ui_MainWindow(object):
@@ -249,7 +249,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "rect"))
         item = self.tableWidgetFeatures.horizontalHeaderItem(4)
         item.setText(_translate("MainWindow", "detect_weight"))
-        self.tabWidgetScene.setTabText(self.tabWidgetScene.indexOf(self.tabFeatures), _translate("MainWindow", "Features"))
+        self.tabWidgetScene.setTabText(self.tabWidgetScene.indexOf(self.tabFeatures),
+                                       _translate("MainWindow", "Features"))
         item = self.tableWidgetObjects.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "index"))
         item = self.tableWidgetObjects.horizontalHeaderItem(1)
@@ -262,7 +263,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "actions"))
         item = self.tableWidgetObjects.horizontalHeaderItem(5)
         item.setText(_translate("MainWindow", "params"))
-        self.tabWidgetScene.setTabText(self.tabWidgetScene.indexOf(self.tabObjects), _translate("MainWindow", "Objects"))
+        self.tabWidgetScene.setTabText(self.tabWidgetScene.indexOf(self.tabObjects),
+                                       _translate("MainWindow", "Objects"))
         item = self.tableWidgetActions.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "index"))
         item = self.tableWidgetActions.horizontalHeaderItem(1)
@@ -273,7 +275,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "dest_scene"))
         item = self.tableWidgetActions.horizontalHeaderItem(4)
         item.setText(_translate("MainWindow", "params"))
-        self.tabWidgetScene.setTabText(self.tabWidgetScene.indexOf(self.tabActions), _translate("MainWindow", "Actions"))
+        self.tabWidgetScene.setTabText(self.tabWidgetScene.indexOf(self.tabActions),
+                                       _translate("MainWindow", "Actions"))
         self.groupBoxPreview.setTitle(_translate("MainWindow", "Preview"))
         self.horizontalSliderScale.setToolTip(_translate("MainWindow", "Scale"))
         self.groupBox.setTitle(_translate("MainWindow", "Scenes"))

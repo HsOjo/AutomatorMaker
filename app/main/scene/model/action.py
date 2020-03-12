@@ -1,6 +1,6 @@
 from dt_automator.maker.model import MakerActionModel
 
-from app.base.dialog.form.field import NumberField
+from ojoqt.dialog.form.field import NumberField
 
 
 class ActionModel(MakerActionModel):

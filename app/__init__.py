@@ -1,6 +1,7 @@
 import typing
 
-from .base import BaseApplication
+from ojoqt import BaseApplication
+
 from .main import MainWindow
 
 

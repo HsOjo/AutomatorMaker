@@ -1,6 +1,6 @@
-from app.base.utils import point_math
-from app.base.widget.graphics import Circle, Mouse
-from app.base.widget.graphics import Line
+from ojoqt.utils import point_math
+from ojoqt.widget.graphics import Circle, Mouse
+from ojoqt.widget.graphics import Line
 
 
 class MouseIndicator:

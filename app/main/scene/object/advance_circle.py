@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QColor
+from ojoqt.widget.graphics import Mouse, Circle
 
-from app.base.widget.graphics import Mouse, Circle
 from app.utils import list_math
 
 

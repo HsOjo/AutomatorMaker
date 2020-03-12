@@ -1,4 +1,4 @@
-from app.base.widget.graphics import Mouse
+from ojoqt.widget.graphics import Mouse
 
 
 class BaseEditor:

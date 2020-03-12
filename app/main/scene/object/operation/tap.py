@@ -1,4 +1,5 @@
-from app.base.widget.graphics import Font
+from ojoqt.widget.graphics import Font
+
 from app.utils import list_math
 from .base import BaseOperation
 from ..advance_circle import AdvanceCircle

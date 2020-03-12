@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QImage
+from ojoqt.widget import GraphicsWidget
 
-from app.base.widget import GraphicsWidget
 from app.main.scene.editor import FeatureEditor, ObjectEditor, ActionEditor, BaseEditor
 from app.main.scene.model import SceneModel, ObjectModel, FeatureModel, ActionModel
 from app.main.scene.object import ColorPicker

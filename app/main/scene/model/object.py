@@ -1,6 +1,6 @@
 from dt_automator.maker.model import MakerObjectModel
+from ojoqt.dialog.form.field.color import ColorField
 
-from app.base.dialog.form.field.color import ColorField
 from .action import ActionModel
 
 

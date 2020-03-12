@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QColor
+from ojoqt.widget.graphics import Rect, Mouse
 
-from app.base.widget.graphics import Rect, Mouse
 from app.utils import list_math
 from .rect_adjuster import RectAdjuster
 

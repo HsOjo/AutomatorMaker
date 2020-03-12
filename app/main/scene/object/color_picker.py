@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QImage, QColor
 
-from app.base.widget.graphics import Mouse, Circle, Line
+from ojoqt.widget.graphics import Mouse, Circle, Line
 
 
 class ColorPicker:

@@ -4,7 +4,8 @@ import shutil
 import time
 from typing import Dict
 
-from app.base.common import try_exec
+from ojoqt.common import try_exec
+
 from app.main.scene.model import SceneModel
 
 

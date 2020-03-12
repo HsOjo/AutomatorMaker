@@ -3,7 +3,7 @@ from typing import List, Dict
 from PyQt5.QtGui import QColor
 
 from app.utils import list_math
-from .base import BaseEditor
+from ..editor.base import BaseEditor
 from ..model import ActionModel, ObjectModel
 from ..object import ObjectRect, MouseIndicator
 from ..object.operation import BaseOperation, TapOperation, SwipeOperation

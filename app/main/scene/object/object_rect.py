@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QLineF
+from ojoqt.widget.graphics import Rect
 
-from app.base.widget.graphics import Rect
 from app.utils import list_math
 
 

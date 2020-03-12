@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QSizePolicy, QLabel
+from ojoqt import BaseView
+from ojoqt.helper import TableHelper
 
-from app.base import BaseView
 from app.res.ui.main import Ui_MainWindow
 from .scene import SceneWidget
-from ..base.helper import TableHelper
 
 
 class MainWindowView(Ui_MainWindow, BaseView):

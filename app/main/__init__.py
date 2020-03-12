@@ -4,21 +4,21 @@ from typing import List
 
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QInputDialog
 from dt_automator import DTAutomator
+from ojoqt import BaseApplication
+from ojoqt import BaseMainWindow
+from ojoqt.common import try_exec
+from ojoqt.dialog import SelectDialog
+from ojoqt.dialog.form import FormDialog
+from ojoqt.dialog.form.field import StringField, RectField, SelectField
+from ojoqt.dialog.form.field.range import RangeField
+from ojoqt.helper import TableHelper
 from pyadb import PyADB, Device
 from pyojo.tools.shell import get_app_shell
 
-from app.base import BaseMainWindow
-from app.base.dialog import SelectDialog
 from .project import Project
 from .scene import ActionEditor, ObjectEditor
 from .scene.model import SceneModel, FeatureModel, ObjectModel, ActionModel
 from .view import MainWindowView
-from .. import BaseApplication
-from ..base.common import try_exec
-from ..base.dialog.form import FormDialog
-from ..base.dialog.form.field import StringField, RectField, SelectField
-from ..base.dialog.form.field.range import RangeField
-from ..base.helper import TableHelper
 from ..config import Config
 
 
