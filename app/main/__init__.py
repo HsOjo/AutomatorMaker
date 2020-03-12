@@ -3,6 +3,7 @@ import sys
 from typing import List
 
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QInputDialog
+from dt_automator import DTAutomator
 from pyadb import PyADB, Device
 from pyojo.tools.shell import get_app_shell
 
@@ -286,6 +287,20 @@ class MainWindow(BaseMainWindow, MainWindowView):
                     item.params = params
                     self.scene_widget.callback_item_edited(self.current_item)
                     self.sync_objects(self.current_items)
+
+    @try_exec(show=True, info_only=True)
+    def _callback_export_data_triggered(self, b: bool):
+        [path, _] = QFileDialog.getSaveFileName(
+            parent=self, caption='Export Data', directory=self._config.export,
+            filter='Data File(*.dat);;All File(*)'
+        )
+
+        if path != '':
+            self._config.export = path
+            self._config.save()
+            dta = DTAutomator()
+            dta.load_from_maker(self._project.path)
+            dta.dump(path)
 
     def _callback_scene_changed(self, current: str, previous: str):
         # Reset tab, if in actions.

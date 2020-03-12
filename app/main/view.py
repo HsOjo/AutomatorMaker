@@ -36,6 +36,7 @@ class MainWindowView(Ui_MainWindow, BaseView):
         self.actionEditItem.triggered.connect(lambda: self._callback_edit_item_triggered(self.current_item_index))
         self.actionDeleteItem.triggered.connect(lambda: self._callback_delete_item_triggered(self.current_item_index))
         self.actionSetItemParams.triggered.connect(self._callback_set_item_params_triggered)
+        self.actionExportData.triggered.connect(self._callback_export_data_triggered)
         self.horizontalSliderScale.valueChanged.connect(self._callback_scale_changed)
         self.tabWidgetScene.currentChanged.connect(self.__callback_scene_tab_changed)
         self.tableWidgetScenes.currentItemChanged.connect(
@@ -74,6 +75,9 @@ class MainWindowView(Ui_MainWindow, BaseView):
         pass
 
     def _callback_set_item_params_triggered(self, b: bool):
+        pass
+
+    def _callback_export_data_triggered(self, b: bool):
         pass
 
     def _callback_scale_changed(self, value):

@@ -20,6 +20,10 @@ class Project:
         )
         self.scenes = {}  # type: Dict[str, SceneModel]
 
+    @property
+    def path(self):
+        return self._path
+
     @staticmethod
     def open(path):
         if os.path.exists(path) and os.path.isdir(path):
