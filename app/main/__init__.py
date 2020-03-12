@@ -4,8 +4,7 @@ from typing import List
 
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QInputDialog
 from dt_automator import DTAutomator
-from ojoqt import BaseApplication
-from ojoqt import BaseMainWindow
+from ojoqt import BaseApplication, BaseMainWindow
 from ojoqt.common import try_exec
 from ojoqt.dialog import SelectDialog
 from ojoqt.dialog.form import FormDialog

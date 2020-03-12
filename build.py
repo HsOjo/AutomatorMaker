@@ -1,7 +1,8 @@
 import os
 import shutil
 
-APP_NAME = 'DTAutomatorMaker'
+from app.res import Const
+
 datas = {}
 
 
@@ -21,8 +22,8 @@ for k, v in datas.items():
     data_str += ' \\\n\t'
     data_str += '--add-data "%s:%s"' % (k, v)
 
-pyi_cmd = 'pyinstaller -F -w -n "%s" %s \\\n__main__.py' % (APP_NAME, data_str)
+pyi_cmd = 'pyinstaller -F -w -n "%s" %s \\\n__main__.py' % (Const.app_name, data_str)
 print(pyi_cmd)
 os.system(pyi_cmd)
-os.unlink('./%s.spec' % APP_NAME)
+os.unlink('./%s.spec' % Const.app_name)
 shutil.rmtree('./build', ignore_errors=True)
