@@ -6,7 +6,7 @@ from app.utils import list_math
 from ..editor.base import BaseEditor
 from ..model import ActionModel, ObjectModel
 from ..object import ObjectRect, MouseIndicator
-from ..object.operation import BaseOperation, TapOperation, SwipeOperation
+from ..object.operation import BaseOperation, TapOperation, SwipeOperation, GroupOperation
 
 
 class ActionEditor(BaseEditor):
@@ -22,9 +22,11 @@ class ActionEditor(BaseEditor):
     TIME_PRESS = 0.3
 
     RADIUS_MOUSE_CIRCLE = 12
+    RADIUS_GROUP_CIRCLE = 24
     RADIUS_TAP_CIRCLE = 16
     RADIUS_SWIPE_CIRCLE = 16
     TYPE_OPERATION = {
+        ActionModel.TYPE_GROUP: GroupOperation,
         ActionModel.TYPE_TAP: TapOperation,
         ActionModel.TYPE_SWIPE: SwipeOperation,
     }
@@ -97,6 +99,8 @@ class ActionEditor(BaseEditor):
 
     def update(self):
         mouse = self.mouse
+        keyboard = self.keyboard
+
         mouse_l = mouse.button(mouse.BUTTON_LEFT)
         self._mouse_indicator.update()
 
@@ -131,9 +135,14 @@ class ActionEditor(BaseEditor):
                                 press_time=press_time,
                             ))
                         else:
-                            self.new_operation(ActionModel.TYPE_TAP, dict(
-                                x=dx, y=dy, count=cc, press_time=press_time
-                            ))
+                            if keyboard.key(keyboard.KEY_G).press:
+                                self.new_operation(ActionModel.TYPE_GROUP, dict(
+                                    x=dx, y=dy
+                                ))
+                            else:
+                                self.new_operation(ActionModel.TYPE_TAP, dict(
+                                    x=dx, y=dy, count=cc, press_time=press_time
+                                ))
                     self._creating = False
         else:
             for operation in self._operations:
@@ -166,9 +175,11 @@ class ActionEditor(BaseEditor):
             operation.load_params(self._object_origin, **params)
             operation.set_callback_moving(self.callback_operation_moving)
             operation.set_focus_color(self.COLOR_FOCUS, self.COLOR_UNFOCUS)
-            if isinstance(operation, TapOperation):
+            if isinstance(operation, GroupOperation):
+                operation.circle.set_radius(self.RADIUS_GROUP_CIRCLE)
+            elif isinstance(operation, TapOperation):
                 operation.circle.set_radius(self.RADIUS_TAP_CIRCLE)
-            if isinstance(operation, SwipeOperation):
+            elif isinstance(operation, SwipeOperation):
                 operation.circle_start.set_radius(self.RADIUS_SWIPE_CIRCLE / 2)
                 operation.circle_end.set_radius(self.RADIUS_SWIPE_CIRCLE)
 

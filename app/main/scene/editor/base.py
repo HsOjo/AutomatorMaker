@@ -1,4 +1,4 @@
-from ojoqt.widget.graphics import Mouse
+from ojoqt.widget.graphics import Mouse, Keyboard
 
 
 class BaseEditor:
@@ -8,6 +8,10 @@ class BaseEditor:
     @property
     def event(self):
         return self._event
+
+    @property
+    def keyboard(self) -> Keyboard:
+        return self._event['keyboard']()
 
     @property
     def mouse(self) -> Mouse:

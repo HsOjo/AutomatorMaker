@@ -1,6 +1,6 @@
 from dt_automator.maker.model import MakerActionModel
 
-from ojoqt.dialog.form.field import NumberField
+from ojoqt.dialog.form.field import NumberField, StringField
 
 
 class ActionModel(MakerActionModel):
@@ -22,6 +22,8 @@ class ActionModel(MakerActionModel):
         finger='Finger Number',
         finger_distance='Finger Distance',
         finger_degree='Finger Rotate Degree',
+
+        actions='Actions'
     )
 
     PARAMS_FIELD = dict(
@@ -42,4 +44,6 @@ class ActionModel(MakerActionModel):
         finger=NumberField,
         finger_distance=NumberField,
         finger_degree=NumberField,
+
+        actions=StringField,
     )

@@ -285,7 +285,7 @@ class MainWindow(BaseMainWindow, MainWindowView):
                 if params is not None:
                     item.params = params
                     self.scene_widget.callback_item_edited(self.current_item)
-                    self.sync_objects(self.current_items)
+                    self.sync_actions(self.current_items)
 
     @try_exec(show=True, info_only=True)
     def _callback_export_data_triggered(self, b: bool):
